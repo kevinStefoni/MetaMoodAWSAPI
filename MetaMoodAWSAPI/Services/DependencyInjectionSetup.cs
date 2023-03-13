@@ -1,4 +1,5 @@
-﻿using MetaMoodAWSAPI.Entities;
+﻿using AutoMapper;
+using MetaMoodAWSAPI.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,6 +18,13 @@ namespace MetaMoodAWSAPI.Services
                 );
             }
             );
+            var mapperConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new AllMappersProfile());
+            });
+
+            IMapper mapper = mapperConfig.CreateMapper();
+            services.AddSingleton(mapper);
             return services;
         }
     }

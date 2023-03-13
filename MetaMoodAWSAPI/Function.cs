@@ -1,5 +1,7 @@
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using AutoMapper;
+using MetaMoodAWSAPI.DTOs;
 using MetaMoodAWSAPI.Entities;
 using MetaMoodAWSAPI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -16,27 +18,39 @@ namespace MetaMoodAWSAPI;
 public class Function
 {
     private readonly IServiceCollection _serviceCollection;
-    private MetaMoodContext _DBContext;
+    private readonly MetaMoodContext _DBContext;
+    private readonly IMapper _Mapper;
 
     public Function()
     {
         _serviceCollection = new ServiceCollection();
-        _serviceCollection.RegisterServices();
-        _DBContext = _serviceCollection.BuildServiceProvider().GetRequiredService<MetaMoodContext>();
+        ServiceProvider serviceProvider = _serviceCollection.RegisterServices().BuildServiceProvider();
+        _DBContext = serviceProvider.GetRequiredService<MetaMoodContext>();
+        _Mapper = serviceProvider.GetRequiredService<IMapper>();
     }
 
 
 
-    public async Task<List<SpotifyTrack>> GetAllTracksAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    public async Task<List<SpotifyTrackDTO>> GetAllTracksAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
 
-        List<SpotifyTrack> tracks = await _DBContext.SpotifyTracks.Select(
-        t => new SpotifyTrack
+        List<SpotifyTrackDTO> tracks = await _DBContext.SpotifyTracks.Select(
+        t => new SpotifyTrackDTO
         {
-            TrackId = t.TrackId,
-            Name = t.Name
+            Name = t.Name,
+            ReleaseDate = t.ReleaseDate,
+            Popularity = t.Popularity,
+            Acousticness = t.Acousticness,
+            Danceability = t.Danceability,
+            Energy = t.Energy,
+            Liveness = t.Liveness,
+            Loudness = t.Loudness,
+            Speechiness = t.Speechiness,
+            Tempo = t.Tempo,
+            Instrumentalness = t.Instrumentalness,
+            Valence = t.Valence
         }
-        ).OrderBy(t => t.TrackId).ToListAsync();
+        ).OrderBy(t => t.Name).ToListAsync();
 
         if (tracks.Count < 0)
         {
@@ -49,16 +63,26 @@ public class Function
         
     }
 
-    public async Task<SpotifyTrack> GetSpotifyTrackByNameAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    public async Task<SpotifyTrackDTO> GetSpotifyTrackByNameAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
 
         string trackName = request.QueryStringParameters["name"];
-        SpotifyTrack? track = await _DBContext.SpotifyTracks.Select
+        SpotifyTrackDTO? track = await _DBContext.SpotifyTracks.Select
         (
-            t => new SpotifyTrack
+            t => new SpotifyTrackDTO
             {
-                TrackId= t.TrackId,
-                Name = t.Name
+                Name = t.Name,
+                ReleaseDate = t.ReleaseDate,
+                Popularity = t.Popularity,
+                Acousticness = t.Acousticness,
+                Danceability = t.Danceability,
+                Energy = t.Energy,
+                Liveness = t.Liveness,
+                Loudness = t.Loudness,
+                Speechiness = t.Speechiness,
+                Tempo = t.Tempo,
+                Instrumentalness = t.Instrumentalness,
+                Valence = t.Valence
             }
         ).FirstOrDefaultAsync(s => s.Name == trackName);
         if (track == null)
