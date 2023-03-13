@@ -40,7 +40,7 @@ public class Function
 
         if (tracks.Count < 0)
         {
-            return null;
+            throw new Exception("Unable to retrieve spotify tracks.");
         }
         else
         {
@@ -48,4 +48,27 @@ public class Function
         }
         
     }
+
+    public async Task<SpotifyTrack> GetSpotifyTrackByNameAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    {
+
+        string trackName = request.QueryStringParameters["name"];
+        SpotifyTrack? track = await _DBContext.SpotifyTracks.Select
+        (
+            t => new SpotifyTrack
+            {
+                TrackId= t.TrackId,
+                Name = t.Name
+            }
+        ).FirstOrDefaultAsync(s => s.Name == trackName);
+        if (track == null)
+        {
+            throw new Exception($"Unable to find track with name {trackName}.");
+        }
+        else
+        {
+            return track;
+        }
+    }
+
 }
