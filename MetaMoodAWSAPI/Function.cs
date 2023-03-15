@@ -19,14 +19,14 @@ public class Function
 {
     private readonly IServiceCollection _serviceCollection;
     private readonly MetaMoodContext _DBContext;
-    private readonly IMapper _Mapper;
+    //private readonly IMapper _Mapper;
 
     public Function()
     {
         _serviceCollection = new ServiceCollection();
         ServiceProvider serviceProvider = _serviceCollection.RegisterServices().BuildServiceProvider();
         _DBContext = serviceProvider.GetRequiredService<MetaMoodContext>();
-        _Mapper = serviceProvider.GetRequiredService<IMapper>();
+        //_Mapper = serviceProvider.GetRequiredService<IMapper>();
     }
 
 

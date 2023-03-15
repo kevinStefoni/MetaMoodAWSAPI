@@ -10,18 +10,21 @@ namespace MetaMoodAWSAPI.Services
         public static IServiceCollection RegisterServices(this IServiceCollection services)
         {
             services.AddEntityFrameworkMySql().AddDbContext<MetaMoodContext>(options =>
-            {
+                {
                 options.UseMySql
-                (
-                    "server=ls-249ad327ce44da9463f737ece7b6de0d2b258dc1.cjdpzq5pew4s.us-east-2.rds.amazonaws.com;port=3306;user=root;password=lsdmCS4243;database=meta_mood",
-                    Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.32-mysql")
-                );
-            }
+                    (
+                    // NOTE about connection string: for development, change environment variable in launchSettings.json
+                    // for production, change environment variable in aws-lambda-tools-defaults.json
+                        System.Environment.GetEnvironmentVariable("ConnectionString"),
+                        Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.32-mysql")
+                    );
+                }
             );
             var mapperConfig = new MapperConfiguration(mc =>
-            {
-                mc.AddProfile(new AllMappersProfile());
-            });
+                {
+                    mc.AddProfile(new AllMappersProfile());
+                }
+            );
 
             IMapper mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
