@@ -2,7 +2,6 @@
 {
     public class SpotifyTrackDTO
     {
-        public string TrackId { get; set; } = null!;
 
         public string? Name { get; set; }
 
