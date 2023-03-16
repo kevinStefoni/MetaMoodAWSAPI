@@ -7,6 +7,10 @@ namespace MetaMoodAWSAPI.Services
     internal class AllMappersProfile : Profile
     {
 
+        /// <summary>
+        /// This method maps DTOs to their entity model counterparts, ignoring attributes that will not be directly displayed
+        /// to users.
+        /// </summary>
         public AllMappersProfile() {
 
             CreateMap<SpotifyTrack, SpotifyTrackDTO>();

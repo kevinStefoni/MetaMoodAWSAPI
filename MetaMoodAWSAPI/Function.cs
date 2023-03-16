@@ -1,14 +1,10 @@
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
-using AutoMapper;
 using MetaMoodAWSAPI.DTOs;
 using MetaMoodAWSAPI.Entities;
 using MetaMoodAWSAPI.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Runtime.CompilerServices;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -19,20 +15,36 @@ public class Function
 {
     private readonly IServiceCollection _serviceCollection;
     private readonly MetaMoodContext _DBContext;
-    //private readonly IMapper _Mapper;
 
+    /// <summary>
+    /// This is the constructor for the Lambda function that sets up the collection of services, calls RegisterServices(),
+    /// and provides a database context for this class. 
+    /// </summary>
     public Function()
     {
         _serviceCollection = new ServiceCollection();
         ServiceProvider serviceProvider = _serviceCollection.RegisterServices().BuildServiceProvider();
         _DBContext = serviceProvider.GetRequiredService<MetaMoodContext>();
-        //_Mapper = serviceProvider.GetRequiredService<IMapper>();
     }
 
 
 
-    public async Task<List<SpotifyTrackDTO>> GetAllTracksAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    /// <summary>
+    /// This function makes an asynchronous request to the database to retrieve and return a page of tracks.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="context"></param>
+    /// <returns>A selected page of tracks from the spotify tracks table</returns>
+    /// <exception cref="Exception">Thrown when track retrieval fails</exception>
+    /// <exception cref="InvalidCastException">Thrown when page size or page number provided as query parameters aren't integers</exception>
+    public async Task<List<SpotifyTrackDTO>> GetTrackPageAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
+        string strPageSize = request.QueryStringParameters["pageSize"];
+        string strPageNumber = request.QueryStringParameters["pageNumber"];
+        if (!(int.TryParse(strPageSize, out int iPageSize) && int.TryParse(strPageNumber, out int iPageNumber)))
+        {
+            throw new InvalidCastException("Page size and page number need to be provided as integers.");
+        }
 
         List<SpotifyTrackDTO> tracks = await _DBContext.SpotifyTracks.Select(
         t => new SpotifyTrackDTO
@@ -50,7 +62,7 @@ public class Function
             Instrumentalness = t.Instrumentalness,
             Valence = t.Valence
         }
-        ).OrderBy(t => t.Name).ToListAsync();
+        ).OrderBy(t => t.Name).GetPage(iPageSize, iPageNumber);
 
         if (tracks.Count < 0)
         {
@@ -63,10 +75,19 @@ public class Function
         
     }
 
+    /// <summary>
+    /// This function makes an asynchronous request to the database to retrieve and a track, based on search criteria, from
+    /// the database. 
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="context"></param>
+    /// <returns>An individual track based on search criteria</returns>
+    /// <exception cref="Exception">Thrown when track retrieval fails</exception>
     public async Task<SpotifyTrackDTO> GetSpotifyTrackByNameAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
 
         string trackName = request.QueryStringParameters["name"];
+        string releaseDate = request.QueryStringParameters["releasedate"];
         SpotifyTrackDTO? track = await _DBContext.SpotifyTracks.Select
         (
             t => new SpotifyTrackDTO
