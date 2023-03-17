@@ -6,7 +6,9 @@ using MetaMoodAWSAPI.Services;
 using MetaMoodAWSAPI.Validation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using System.Net;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -39,20 +41,30 @@ public class Function
     /// <returns>A selected page of tracks from the spotify tracks table</returns>
     /// <exception cref="Exception">Thrown when track retrieval fails</exception>
     /// <exception cref="InvalidCastException">Thrown when page size or page number provided as query parameters aren't integers</exception>
-    public async Task<List<SpotifyTrackDTO>> GetTrackPageAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    public async Task<APIGatewayHttpApiV2ProxyResponse> GetTrackPageAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
         string strPageSize = request.QueryStringParameters["pageSize"];
         string strPageNumber = request.QueryStringParameters["pageNumber"];
-        string sortBy = request.QueryStringParameters["sortby"];
+        if (!request.QueryStringParameters.TryGetValue("sortby", out string? sortBy))
+        {
+            sortBy = "name";
+        }
+
         if (!(int.TryParse(strPageSize, out int iPageSize) && int.TryParse(strPageNumber, out int iPageNumber)))
         {
             throw new InvalidCastException("Page size and page number need to be provided as integers.");
         }
 
-        SpotifyValidation.ValidateSpotifySortBy(ref sortBy);
-        
+        if (!SpotifyValidation.ValidateSpotifySortBy(ref sortBy))
+        {
+            return new APIGatewayHttpApiV2ProxyResponse()
+            {
+                StatusCode = (int)HttpStatusCode.BadRequest
+            };
+        }
 
-        
+
+
 
         List<SpotifyTrackDTO> tracks = await _DBContext.SpotifyTracks.Select(
         t => new SpotifyTrackDTO
@@ -74,15 +86,21 @@ public class Function
 
         if (tracks.Count < 0)
         {
-            throw new Exception("Unable to retrieve spotify tracks.");
+            return new APIGatewayHttpApiV2ProxyResponse()
+            {
+                StatusCode = (int)HttpStatusCode.NotFound
+            };
         }
         else
         {
-            return tracks;
+            return new APIGatewayHttpApiV2ProxyResponse()
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Body = JsonConvert.SerializeObject(tracks)
+            };
         }
-        
-    }
 
+    }
     /// <summary>
     /// This function makes an asynchronous request to the database to retrieve and a track, based on search criteria, from
     /// the database. 
