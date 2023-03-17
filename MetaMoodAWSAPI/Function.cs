@@ -3,8 +3,10 @@ using Amazon.Lambda.Core;
 using MetaMoodAWSAPI.DTOs;
 using MetaMoodAWSAPI.Entities;
 using MetaMoodAWSAPI.Services;
+using MetaMoodAWSAPI.Validation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.ComponentModel.DataAnnotations;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -41,10 +43,16 @@ public class Function
     {
         string strPageSize = request.QueryStringParameters["pageSize"];
         string strPageNumber = request.QueryStringParameters["pageNumber"];
+        string sortBy = request.QueryStringParameters["sortby"];
         if (!(int.TryParse(strPageSize, out int iPageSize) && int.TryParse(strPageNumber, out int iPageNumber)))
         {
             throw new InvalidCastException("Page size and page number need to be provided as integers.");
         }
+
+        SpotifyValidation.ValidateSpotifySortBy(ref sortBy);
+        
+
+        
 
         List<SpotifyTrackDTO> tracks = await _DBContext.SpotifyTracks.Select(
         t => new SpotifyTrackDTO
@@ -62,7 +70,7 @@ public class Function
             Instrumentalness = t.Instrumentalness,
             Valence = t.Valence
         }
-        ).OrderBy(t => t.Name).GetPage(iPageSize, iPageNumber);
+        ).SpotifyTrackSortBy<SpotifyTrackDTO>(sortBy).GetPage(iPageSize, iPageNumber).ToListAsync();
 
         if (tracks.Count < 0)
         {
