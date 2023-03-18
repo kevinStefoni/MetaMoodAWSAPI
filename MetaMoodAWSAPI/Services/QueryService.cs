@@ -1,5 +1,4 @@
 ﻿using MetaMoodAWSAPI.DTOs;
-using Microsoft.EntityFrameworkCore;
 
 namespace MetaMoodAWSAPI.Services
 {
@@ -19,13 +18,12 @@ namespace MetaMoodAWSAPI.Services
 
         /// <summary>
         /// This function is an extension method for IQueryable<SpotifyTrackDTO> that sorts by a given search
-        /// criteria.
+        /// criteria. Method assumes that sort criteria has been validated.
         /// </summary>
         /// <typeparam name="T">This generic type actually receives SpotifyTrackDTO</typeparam>
         /// <param name="query">The query that needs to be further refined with sorting</param>
         /// <param name="sortBy">The criteria on which the tracks will be sorted</param>
         /// <returns>A query that also includes sorting based on a criteria</returns>
-        /// <exception cref="ArgumentException">Thrown when sorting criteria is invalid</exception>
         public static IQueryable<T> SpotifyTrackSortBy<T>(this IQueryable<SpotifyTrackDTO> query, string sortBy)
         {
             switch(sortBy)
@@ -67,7 +65,7 @@ namespace MetaMoodAWSAPI.Services
                     return (IQueryable<T>)query.OrderBy(t => t.Valence);
 
                 default:
-                    throw new ArgumentException("Invalid search criteria.");
+                    return (IQueryable<T>)query.OrderBy(t => t.Name);
             }
         }
 

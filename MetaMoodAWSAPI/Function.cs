@@ -39,8 +39,6 @@ public class Function
     /// <param name="request"></param>
     /// <param name="context"></param>
     /// <returns>A selected page of tracks from the spotify tracks table</returns>
-    /// <exception cref="Exception">Thrown when track retrieval fails</exception>
-    /// <exception cref="InvalidCastException">Thrown when page size or page number provided as query parameters aren't integers</exception>
     public async Task<APIGatewayHttpApiV2ProxyResponse> GetTrackPageAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
         string strPageSize = request.QueryStringParameters["pageSize"];
@@ -50,23 +48,14 @@ public class Function
             sortBy = "name";
         }
 
-        if (!(int.TryParse(strPageSize, out int iPageSize) && int.TryParse(strPageNumber, out int iPageNumber)))
+        if (!int.TryParse(strPageSize, out int iPageSize)
+            || !int.TryParse(strPageNumber, out int iPageNumber)
+            || !SpotifyValidation.ValidateSpotifySortBy(ref sortBy))
         {
-            throw new InvalidCastException("Page size and page number need to be provided as integers.");
+            return Response.BadRequest();
         }
 
-        if (!SpotifyValidation.ValidateSpotifySortBy(ref sortBy))
-        {
-            return new APIGatewayHttpApiV2ProxyResponse()
-            {
-                StatusCode = (int)HttpStatusCode.BadRequest
-            };
-        }
-
-
-
-
-        List<SpotifyTrackDTO> tracks = await _DBContext.SpotifyTracks.Select(
+        IList<SpotifyTrackDTO> tracks = await _DBContext.SpotifyTracks.Select(
         t => new SpotifyTrackDTO
         {
             Name = t.Name,
@@ -86,18 +75,11 @@ public class Function
 
         if (tracks.Count < 0)
         {
-            return new APIGatewayHttpApiV2ProxyResponse()
-            {
-                StatusCode = (int)HttpStatusCode.NotFound
-            };
+            return Response.NotFound();
         }
         else
         {
-            return new APIGatewayHttpApiV2ProxyResponse()
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Body = JsonConvert.SerializeObject(tracks)
-            };
+            return Response.OK(tracks);
         }
 
     }
