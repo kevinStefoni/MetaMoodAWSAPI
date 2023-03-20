@@ -47,8 +47,9 @@ public class Function
         }
         catch (Exception ex)
         {
-            Response.BadRequest(ex.Message);
+            return Response.BadRequest(ex.Message);
         }
+
         IList<SpotifyTrackDTO> tracks = await _DBContext.SpotifyTracks.Select(
         t => new SpotifyTrackDTO
         {
@@ -69,7 +70,7 @@ public class Function
         .SpotifyTrackSearchBy<SpotifyTrackDTO>(spotifyParameters)
         .GetPage(spotifyParameters.PageSize, spotifyParameters.PageNumber).ToListAsync();
 
-        if (tracks.Count < 0)
+        if (tracks.Count <= 0)
         {
             return Response.NotFound();
         }

@@ -6,11 +6,27 @@ namespace MetaMoodAWSAPI.Services
     internal class QueryParameterService
     {
 
+        /// <summary>
+        /// This method retrieves and calls validators for all query parameters that were provided in the GET request.
+        /// It will populate the SpotifyParameters object that has all the search and sort criteria. 
+        /// </summary>
+        /// <param name="spotifyParameters"></param>
+        /// <param name="queryParameters"></param>
+        /// <returns>An object with all search criteria provided by URL query parameters</returns>
+        /// <exception cref="Exception">Thrown when there is missing or invalid input</exception>
         public static SpotifyParameters GetSpotifyQueryParameters(SpotifyParameters spotifyParameters, IDictionary<string, string> queryParameters)
         {
             if(queryParameters.ContainsKey("pageSize"))
             {
-                spotifyParameters.PageSize = Convert.ToInt32(queryParameters["pageSize"]);
+                try
+                {
+                    spotifyParameters.PageSize = Convert.ToInt32(queryParameters["pageSize"]);
+                }
+                catch
+                {
+                    throw new Exception("Page size must be an integer.");
+                }
+                
             }
             else
             {
@@ -19,7 +35,14 @@ namespace MetaMoodAWSAPI.Services
 
             if(queryParameters.ContainsKey("pageNumber"))
             {
-                spotifyParameters.PageNumber = Convert.ToInt32(queryParameters["pageNumber"]);
+                try
+                {
+                    spotifyParameters.PageNumber = Convert.ToInt32(queryParameters["pageNumber"]);
+                }
+                catch
+                {
+                    throw new Exception("Page number must be an integer.");
+                }
             }
             else
             {

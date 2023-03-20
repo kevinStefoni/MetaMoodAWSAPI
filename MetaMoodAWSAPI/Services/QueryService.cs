@@ -46,7 +46,7 @@ namespace MetaMoodAWSAPI.Services
         }
 
         /// <summary>
-        /// This adds all of the search criteria given in the URL query parameters, including ranges and names
+        /// This extension method adds all of the search criteria given in the URL query parameters, including ranges and names
         /// </summary>
         /// <typeparam name="T">This should always be SpotifyTrackDTO</typeparam>
         /// <param name="query">The sorted, but unfiltered query</param>
