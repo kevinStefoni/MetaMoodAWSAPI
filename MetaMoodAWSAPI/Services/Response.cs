@@ -11,11 +11,14 @@ namespace MetaMoodAWSAPI.Services
         /// A simple lambda that returns HttpStatus code 400 for AWS API Gateway HTTP response.
         /// The purpose of this method is to clean up the code in Function.cs.
         /// </summary>
-        /// <returns>HTTP error code 400 - Bad Request</returns>
-        public static APIGatewayHttpApiV2ProxyResponse BadRequest() => 
+        /// <param name="errorMessage">The error message returned by the exception that was thrown (probably during data
+        /// retrieval or validation).</param>
+        /// <returns>HTTP error code 400 - Bad Request with error message</returns>
+        public static APIGatewayHttpApiV2ProxyResponse BadRequest(string? errorMessage) => 
             new()
             {
-                StatusCode = (int)HttpStatusCode.BadRequest
+                StatusCode = (int)HttpStatusCode.BadRequest,
+                Body = errorMessage ?? "No error message provided"
             };
 
         /// <summary>

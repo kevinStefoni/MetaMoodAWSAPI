@@ -1,12 +1,12 @@
-﻿namespace MetaMoodAWSAPI.Validation
+﻿using MetaMoodAWSAPI.QueryParameterModels;
+
+namespace MetaMoodAWSAPI.Validation
 {
     internal class SpotifyValidation
     {
 
-        public static bool ValidateSpotifySortBy(ref string sortby)
+        public static bool ValidateSpotifySortBy(string? sortby)
         {
-            if (sortby.Equals(string.Empty))
-                sortby = "name";
 
             return sortby == "name"
                 || sortby == "releasedate"

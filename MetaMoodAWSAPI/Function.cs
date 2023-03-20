@@ -7,7 +7,6 @@ using MetaMoodAWSAPI.Services;
 using MetaMoodAWSAPI.Validation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.ComponentModel.DataAnnotations;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -40,44 +39,16 @@ public class Function
     /// <returns>A selected page of tracks from the spotify tracks table</returns>
     public async Task<APIGatewayHttpApiV2ProxyResponse> GetTrackPageAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
-        IDictionary<string, string> searchCriteria = new Dictionary<string, string>();
-        string? lowerReleaseDate = null, upperReleaseDate = null;
+        SpotifyParameters spotifyParameters = new ();
 
-        if(!(request.QueryStringParameters.TryGetValue("pageSize", out string? strPageSize)
-            && request.QueryStringParameters.TryGetValue("pageNumber", out string? strPageNumber)))
+        try
         {
-            return Response.BadRequest();
+            spotifyParameters = QueryParameterService.GetSpotifyQueryParameters(spotifyParameters, request.QueryStringParameters);
         }
-
-        if (!request.QueryStringParameters.TryGetValue("sortby", out string? sortBy))
+        catch (Exception ex)
         {
-            sortBy = "name";
+            Response.BadRequest(ex.Message);
         }
-
-        if(request.QueryStringParameters.TryGetValue("name", out string? name))
-        {
-            searchCriteria["name"] = name;
-        }
-        
-        if(request.QueryStringParameters.TryGetValue("lowerReleaseDate", out lowerReleaseDate)
-            || request.QueryStringParameters.TryGetValue("upperReleaseDate", out upperReleaseDate))
-        {
-            lowerReleaseDate ??= "0000-00-00";
-            upperReleaseDate ??= "9999-99-99";
-
-            searchCriteria["lowerReleaseDate"] = lowerReleaseDate;
-            searchCriteria["upperReleaseDate"] = upperReleaseDate;
-
-        }
-        
-
-        if (!int.TryParse(strPageSize, out int iPageSize)
-            || !int.TryParse(strPageNumber, out int iPageNumber)
-            || !SpotifyValidation.ValidateSpotifySortBy(ref sortBy))
-        {
-            return Response.BadRequest();
-        }
-
         IList<SpotifyTrackDTO> tracks = await _DBContext.SpotifyTracks.Select(
         t => new SpotifyTrackDTO
         {
@@ -94,7 +65,9 @@ public class Function
             Instrumentalness = t.Instrumentalness,
             Valence = t.Valence
         }
-        ).SpotifyTrackSortBy<SpotifyTrackDTO>(sortBy).GetPage(iPageSize, iPageNumber).ToListAsync();
+        ).SpotifyTrackSortBy<SpotifyTrackDTO>(spotifyParameters.SortBy)
+        .SpotifyTrackSearchBy<SpotifyTrackDTO>(spotifyParameters)
+        .GetPage(spotifyParameters.PageSize, spotifyParameters.PageNumber).ToListAsync();
 
         if (tracks.Count < 0)
         {

@@ -1,4 +1,5 @@
 ﻿using MetaMoodAWSAPI.DTOs;
+using MetaMoodAWSAPI.QueryParameterModels;
 
 namespace MetaMoodAWSAPI.Services
 {
@@ -20,53 +21,50 @@ namespace MetaMoodAWSAPI.Services
         /// This function is an extension method for IQueryable<SpotifyTrackDTO> that sorts by a given search
         /// criteria. Method assumes that sort criteria has been validated.
         /// </summary>
-        /// <typeparam name="T">This generic type actually receives SpotifyTrackDTO</typeparam>
+        /// <typeparam name="T">This generic type should only actually receive SpotifyTrackDTO</typeparam>
         /// <param name="query">The query that needs to be further refined with sorting</param>
         /// <param name="sortBy">The criteria on which the tracks will be sorted</param>
         /// <returns>A query that also includes sorting based on a criteria</returns>
         public static IQueryable<T> SpotifyTrackSortBy<T>(this IQueryable<SpotifyTrackDTO> query, string sortBy)
         {
-            switch(sortBy)
+            return sortBy switch
             {
-                case "name":
-                    return (IQueryable<T>)query.OrderBy(t => t.Name);
+                "name" => (IQueryable<T>)query.OrderBy(t => t.Name),
+                "releasedate" => (IQueryable<T>)query.OrderBy(t => t.ReleaseDate),
+                "popularity" => (IQueryable<T>)query.OrderBy(t => t.Popularity),
+                "acousticness" => (IQueryable<T>)query.OrderBy(t => t.Acousticness),
+                "danceability" => (IQueryable<T>)query.OrderBy(t => t.Danceability),
+                "energy" => (IQueryable<T>)query.OrderBy(t => t.Energy),
+                "liveness" => (IQueryable<T>)query.OrderBy(t => t.Liveness),
+                "loudness" => (IQueryable<T>)query.OrderBy(t => t.Loudness),
+                "speechiness" => (IQueryable<T>)query.OrderBy(t => t.Speechiness),
+                "tempo" => (IQueryable<T>)query.OrderBy(t => t.Tempo),
+                "instrumentalness" => (IQueryable<T>)query.OrderBy(t => t.Instrumentalness),
+                "valence" => (IQueryable<T>)query.OrderBy(t => t.Valence),
+                _ => (IQueryable<T>)query.OrderBy(t => t.Name),
+            };
+        }
 
-                case "releasedate":
-                    return (IQueryable<T>)query.OrderBy(t => t.ReleaseDate);
+        /// <summary>
+        /// This adds all of the search criteria given in the URL query parameters, including ranges and names
+        /// </summary>
+        /// <typeparam name="T">This should always be SpotifyTrackDTO</typeparam>
+        /// <param name="query">The sorted, but unfiltered query</param>
+        /// <param name="spotifyParameters">The object containing all criteria given by client</param>
+        /// <returns>A query that has all the WHERE conditions applied</returns>
+        public static IQueryable<T> SpotifyTrackSearchBy<T>(this IQueryable<SpotifyTrackDTO> query, SpotifyParameters spotifyParameters)
+        {
 
-                case "popularity":
-                    return (IQueryable<T>)query.OrderBy(t => t.Popularity);
+            if(spotifyParameters.Name is not null)
+                query = query.Where(t => t.Name == spotifyParameters.Name);
 
-                case "acousticness":
-                    return (IQueryable<T>)query.OrderBy(t => t.Acousticness);
+            if (spotifyParameters.LowerReleaseDate is not null)
+                query = query.Where(t => String.Compare(t.ReleaseDate, spotifyParameters.LowerReleaseDate) > 0);
 
-                case "danceability":
-                    return (IQueryable<T>)query.OrderBy(t => t.Danceability);
+            if(spotifyParameters.UpperReleaseDate is not null)
+                query = query.Where(t => String.Compare(t.ReleaseDate, spotifyParameters.UpperReleaseDate) < 0);
 
-                case "energy":
-                    return (IQueryable<T>)query.OrderBy(t => t.Energy);
-
-                case "liveness":
-                    return (IQueryable<T>)query.OrderBy(t => t.Liveness);
-
-                case "loudness":
-                    return (IQueryable<T>)query.OrderBy(t => t.Loudness);
-
-                case "speechiness":
-                    return (IQueryable<T>)query.OrderBy(t => t.Speechiness);
-
-                case "tempo":
-                    return (IQueryable<T>)query.OrderBy(t => t.Tempo);
-
-                case "instrumentalness":
-                    return (IQueryable<T>)query.OrderBy(t => t.Instrumentalness);
-
-                case "valence":
-                    return (IQueryable<T>)query.OrderBy(t => t.Valence);
-
-                default:
-                    return (IQueryable<T>)query.OrderBy(t => t.Name);
-            }
+            return (IQueryable<T>) query;
         }
 
     }
