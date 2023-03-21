@@ -73,6 +73,246 @@ namespace MetaMoodAWSAPI.Services
                 spotifyParameters.UpperReleaseDate = queryParameters["upperReleaseDate"];
             }
 
+            if (queryParameters.ContainsKey("lowerPopularity"))
+            {
+                try
+                {
+                    spotifyParameters.LowerPopularity = Convert.ToInt32(queryParameters["lowerPopularity"]);
+                }
+                catch
+                {
+                    throw new Exception("Lower bound for popularity must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("upperPopularity"))
+            {
+                try
+                {
+                    spotifyParameters.UpperPopularity = Convert.ToInt32(queryParameters["upperPopularity"]);
+                }
+                catch
+                {
+                    throw new Exception("Upper bound for popularity must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("lowerAcousticness"))
+            {
+                try
+                {
+                    spotifyParameters.LowerAcousticness = Convert.ToDouble(queryParameters["lowerAcousticness"]);
+                }
+                catch
+                {
+                    throw new Exception("Lower bound for acousticness must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("upperAcousticness"))
+            {
+                try
+                {
+                    spotifyParameters.UpperAcousticness = Convert.ToDouble(queryParameters["upperAcousticness"]);
+                }
+                catch
+                {
+                    throw new Exception("Upper bound for acousticness must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("lowerDanceability"))
+            {
+                try
+                {
+                    spotifyParameters.LowerDanceability = Convert.ToDouble(queryParameters["lowerDanceability"]);
+                }
+                catch
+                {
+                    throw new Exception("Lower bound for danceability must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("upperDanceability"))
+            {
+                try
+                {
+                    spotifyParameters.UpperDanceability = Convert.ToDouble(queryParameters["upperDanceability"]);
+                }
+                catch
+                {
+                    throw new Exception("Upper bound for danceability must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("lowerEnergy"))
+            {
+                try
+                {
+                    spotifyParameters.LowerEnergy = Convert.ToDouble(queryParameters["lowerEnergy"]);
+                }
+                catch
+                {
+                    throw new Exception("Lower bound for energy must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("upperEnergy"))
+            {
+                try
+                {
+                    spotifyParameters.UpperEnergy = Convert.ToDouble(queryParameters["upperEnergy"]);
+                }
+                catch
+                {
+                    throw new Exception("Upper bound for energy must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("lowerLiveness"))
+            {
+                try
+                {
+                    spotifyParameters.LowerLiveness = Convert.ToDouble(queryParameters["lowerLiveness"]);
+                }
+                catch
+                {
+                    throw new Exception("Lower bound for liveness must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("upperLiveness"))
+            {
+                try
+                {
+                    spotifyParameters.UpperLiveness = Convert.ToDouble(queryParameters["upperLiveness"]);
+                }
+                catch
+                {
+                    throw new Exception("Upper bound for liveness must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("lowerLoudness"))
+            {
+                try
+                {
+                    spotifyParameters.LowerLoudness = Convert.ToDouble(queryParameters["lowerLoudness"]);
+                }
+                catch
+                {
+                    throw new Exception("Lower bound for loudness must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("upperLoudness"))
+            {
+                try
+                {
+                    spotifyParameters.UpperLoudness = Convert.ToDouble(queryParameters["upperLoudness"]);
+                }
+                catch
+                {
+                    throw new Exception("Upper bound for loudness must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("lowerSpeechiness"))
+            {
+                try
+                {
+                    spotifyParameters.LowerSpeechiness = Convert.ToDouble(queryParameters["lowerSpeechiness"]);
+                }
+                catch
+                {
+                    throw new Exception("Lower bound for speechiness must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("upperSpeechiness"))
+            {
+                try
+                {
+                    spotifyParameters.UpperSpeechiness = Convert.ToDouble(queryParameters["upperSpeechiness"]);
+                }
+                catch
+                {
+                    throw new Exception("Upper bound for speechiness must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("lowerTempo"))
+            {
+                try
+                {
+                    spotifyParameters.LowerTempo = Convert.ToDouble(queryParameters["lowerTempo"]);
+                }
+                catch
+                {
+                    throw new Exception("Lower bound for tempo must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("upperTempo"))
+            {
+                try
+                {
+                    spotifyParameters.UpperTempo = Convert.ToDouble(queryParameters["upperTempo"]);
+                }
+                catch
+                {
+                    throw new Exception("Upper bound for tempo must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("lowerInstrumentalness"))
+            {
+                try
+                {
+                    spotifyParameters.LowerInstrumentalness = Convert.ToDouble(queryParameters["lowerInstrumentalness"]);
+                }
+                catch
+                {
+                    throw new Exception("Lower bound for instrumentalness must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("upperInstrumentalness"))
+            {
+                try
+                {
+                    spotifyParameters.UpperInstrumentalness = Convert.ToDouble(queryParameters["upperInstrumentalness"]);
+                }
+                catch
+                {
+                    throw new Exception("Upper bound for instrumentalness must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("lowerValence"))
+            {
+                try
+                {
+                    spotifyParameters.LowerValence = Convert.ToDouble(queryParameters["lowerValence"]);
+                }
+                catch
+                {
+                    throw new Exception("Lower bound for valence must be an integer.");
+                }
+            }
+
+            if (queryParameters.ContainsKey("upperValence"))
+            {
+                try
+                {
+                    spotifyParameters.UpperValence = Convert.ToDouble(queryParameters["upperValence"]);
+                }
+                catch
+                {
+                    throw new Exception("Upper bound for valence must be an integer.");
+                }
+            }
+
             return spotifyParameters;
         }
     }

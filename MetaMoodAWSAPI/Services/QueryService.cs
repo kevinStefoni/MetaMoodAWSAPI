@@ -64,6 +64,66 @@ namespace MetaMoodAWSAPI.Services
             if(spotifyParameters.UpperReleaseDate is not null)
                 query = query.Where(t => String.Compare(t.ReleaseDate, spotifyParameters.UpperReleaseDate) < 0);
 
+            if (spotifyParameters.LowerPopularity is not null)
+                query = query.Where(t => t.Popularity > spotifyParameters.LowerPopularity);
+
+            if(spotifyParameters.UpperPopularity is not null)
+                query = query.Where(t => t.Popularity < spotifyParameters.UpperPopularity);
+
+            if (spotifyParameters.LowerAcousticness is not null)
+                query = query.Where(t => t.Acousticness > spotifyParameters.LowerAcousticness);
+
+            if (spotifyParameters.UpperAcousticness is not null)
+                query = query.Where(t => t.Acousticness < spotifyParameters.UpperAcousticness);
+
+            if(spotifyParameters.LowerDanceability is not null)
+                query = query.Where(t => t.Danceability > spotifyParameters.LowerDanceability);
+
+            if(spotifyParameters.UpperDanceability is not null)
+                query = query.Where(t => t.Danceability < spotifyParameters.UpperDanceability);
+
+            if(spotifyParameters.LowerEnergy is not null)
+                query = query.Where(t => t.Energy > spotifyParameters.LowerEnergy);
+
+            if(spotifyParameters.UpperEnergy is not null)
+                query = query.Where(t => t.Energy < spotifyParameters.UpperEnergy);
+
+            if(spotifyParameters.LowerLiveness is not null)
+                query = query.Where(t => t.Liveness > spotifyParameters.LowerLiveness);
+
+            if(spotifyParameters.UpperLiveness is not null)
+                query = query.Where(t => t.Liveness < spotifyParameters.UpperLiveness);
+
+            if(spotifyParameters.LowerLoudness is not null)
+                query = query.Where(t => t.Loudness  > spotifyParameters.LowerLoudness);
+
+            if(spotifyParameters.UpperLoudness is not null)
+                query = query.Where(t => t.Loudness < spotifyParameters.UpperLoudness);
+
+            if(spotifyParameters.LowerSpeechiness is not null)
+                query = query.Where(t => t.Speechiness > spotifyParameters.LowerSpeechiness);
+
+            if(spotifyParameters.UpperSpeechiness is not null)
+                query = query.Where(t => t.Speechiness < spotifyParameters.UpperSpeechiness);
+            
+            if(spotifyParameters.LowerTempo is not null)
+                query = query.Where(t => t.Tempo > spotifyParameters.LowerTempo);
+
+            if(spotifyParameters.UpperTempo is not null)
+                query = query.Where(t => t.Tempo < spotifyParameters.UpperTempo);
+
+            if(spotifyParameters.LowerInstrumentalness is not null)
+                query = query.Where(t => t.Instrumentalness > spotifyParameters.LowerInstrumentalness);
+
+            if(spotifyParameters.UpperInstrumentalness is not null)
+                query = query.Where(t => t.Instrumentalness < spotifyParameters.UpperInstrumentalness);
+
+            if(spotifyParameters.LowerValence is not null)
+                query = query.Where(t => t.Valence > spotifyParameters.LowerValence);
+
+            if(spotifyParameters.UpperValence is not null)
+                query = query.Where(t => t.Valence  < spotifyParameters.UpperValence);
+
             return (IQueryable<T>) query;
         }
 

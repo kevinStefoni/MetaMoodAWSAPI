@@ -36,6 +36,10 @@ namespace MetaMoodAWSAPI.QueryParameterModels
 
         public double? UpperLiveness { get; set; } = null;
 
+        public double? LowerLoudness { get; set; } = null;
+
+        public double? UpperLoudness { get; set; } = null;
+
         public double? LowerSpeechiness { get; set; } = null;
 
         public double? UpperSpeechiness { get; set; } = null;

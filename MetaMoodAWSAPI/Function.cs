@@ -80,45 +80,5 @@ public class Function
         }
 
     }
-    /// <summary>
-    /// This function makes an asynchronous request to the database to retrieve and a track, based on search criteria, from
-    /// the database. 
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="context"></param>
-    /// <returns>An individual track based on search criteria</returns>
-    /// <exception cref="Exception">Thrown when track retrieval fails</exception>
-    public async Task<SpotifyTrackDTO> GetSpotifyTrackByNameAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
-    {
-
-        string trackName = request.QueryStringParameters["name"];
-        string releaseDate = request.QueryStringParameters["releasedate"];
-        SpotifyTrackDTO? track = await _DBContext.SpotifyTracks.Select
-        (
-            t => new SpotifyTrackDTO
-            {
-                Name = t.Name,
-                ReleaseDate = t.ReleaseDate,
-                Popularity = t.Popularity,
-                Acousticness = t.Acousticness,
-                Danceability = t.Danceability,
-                Energy = t.Energy,
-                Liveness = t.Liveness,
-                Loudness = t.Loudness,
-                Speechiness = t.Speechiness,
-                Tempo = t.Tempo,
-                Instrumentalness = t.Instrumentalness,
-                Valence = t.Valence
-            }
-        ).FirstOrDefaultAsync(s => s.Name == trackName);
-        if (track == null)
-        {
-            throw new Exception($"Unable to find track with name {trackName}.");
-        }
-        else
-        {
-            return track;
-        }
-    }
 
 }
