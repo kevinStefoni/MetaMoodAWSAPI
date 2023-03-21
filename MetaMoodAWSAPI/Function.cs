@@ -4,7 +4,6 @@ using MetaMoodAWSAPI.DTOs;
 using MetaMoodAWSAPI.Entities;
 using MetaMoodAWSAPI.QueryParameterModels;
 using MetaMoodAWSAPI.Services;
-using MetaMoodAWSAPI.Validation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 

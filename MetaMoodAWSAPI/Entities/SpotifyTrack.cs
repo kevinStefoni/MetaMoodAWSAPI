@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace MetaMoodAWSAPI.Entities;
+﻿namespace MetaMoodAWSAPI.Entities;
 
 public partial class SpotifyTrack
 {

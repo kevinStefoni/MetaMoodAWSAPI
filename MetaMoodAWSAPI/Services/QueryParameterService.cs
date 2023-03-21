@@ -30,7 +30,7 @@ namespace MetaMoodAWSAPI.Services
             }
             else
             {
-                throw new Exception("Page size is a required parameter");
+                throw new Exception("Page size is a required parameter.");
             }
 
             if(queryParameters.ContainsKey("pageNumber"))

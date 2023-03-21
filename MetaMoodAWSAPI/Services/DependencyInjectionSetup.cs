@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using MetaMoodAWSAPI.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Security.Cryptography.X509Certificates;
 
 namespace MetaMoodAWSAPI.Services
 {
