@@ -28,6 +28,17 @@ public class Function
         _DBContext = serviceProvider.GetRequiredService<MetaMoodContext>();
     }
 
+    /// <summary>
+    /// Constructor that allows injection of DBContext. This method is to allow unit tests to inject their own DB context.
+    /// </summary>
+    /// <param name="dbContext">The database context created in the test project</param>
+    public Function(MetaMoodContext dbContext)
+    {
+        _serviceCollection = new ServiceCollection();
+        _serviceCollection.RegisterServices().BuildServiceProvider();
+        _DBContext = dbContext;
+    }
+
 
 
     /// <summary>
