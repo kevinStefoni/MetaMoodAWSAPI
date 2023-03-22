@@ -29,7 +29,8 @@ namespace MetaMoodAWSAPI.Services
         public static APIGatewayHttpApiV2ProxyResponse NotFound() =>
             new()
             {
-                StatusCode = (int)HttpStatusCode.NotFound
+                StatusCode = (int)HttpStatusCode.NotFound,
+                Body = "Item(s) not found."
             };
 
         /// <summary>

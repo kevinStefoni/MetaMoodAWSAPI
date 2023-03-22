@@ -155,7 +155,135 @@ public class FunctionTest
             ["pageNumber"] = "2",
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
-        Assert.Equal(20, JsonConvert.DeserializeObject<List<SpotifyTrackDTO>>(response.Body)?.Count());
+        IList<SpotifyTrackDTO> tracks = JsonConvert.DeserializeObject<List<SpotifyTrackDTO>>(response.Body) ?? new List<SpotifyTrackDTO>();
+        Assert.Equal(20, tracks.Count);
+
+    }
+
+    [Fact]
+    public async void TestGetTrackPageAsyncGetPageSortByAcousticness()
+    {
+
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["pageSize"] = "50",
+            ["pageNumber"] = "3",
+            ["sortBy"] = "acousticness"
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        IList<SpotifyTrackDTO> tracks = JsonConvert.DeserializeObject<List<SpotifyTrackDTO>>(response.Body) ?? new List<SpotifyTrackDTO>();
+        IList<SpotifyTrackDTO> expectedTracks = tracks.OrderBy(t => t.Acousticness).ToList();
+        Assert.Equal(50, tracks.Count);
+        Assert.Equal(expectedTracks, tracks);
+
+    }
+
+    [Fact]
+    public async void TestGetTrackPageAsyncGetPageSortByValenceSearchByLowerLiveness()
+    {
+        double livenessAmt = 0.75;
+
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["pageSize"] = "50",
+            ["pageNumber"] = "1",
+            ["sortBy"] = "valence",
+            ["lowerLiveness"] = $"{livenessAmt}"
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        IList<SpotifyTrackDTO> tracks = JsonConvert.DeserializeObject<List<SpotifyTrackDTO>>(response.Body) ?? new List<SpotifyTrackDTO>();
+        IList<SpotifyTrackDTO> expectedTracks = tracks.OrderBy(t => t.Valence).Where(t => t.Liveness > livenessAmt).ToList();
+        Assert.Equal(50, tracks.Count);
+        Assert.Equal(expectedTracks, tracks);
+
+    }
+
+    [Fact]
+    public async void TestGetTrackPageAsyncGetPageSortByReleaseDateSearchByLowerReleaseDateUpperReleaseDateLowerEnergy()
+    {
+        string lowerReleaseDate = "2001";
+        string upperReleaseDate = "2010";
+        double lowerEnergy = 0.5;
+
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["pageSize"] = "50",
+            ["pageNumber"] = "1",
+            ["sortBy"] = "releasedate",
+            ["lowerReleaseDate"] = $"{lowerReleaseDate}",
+            ["upperReleaseDate"] = $"{upperReleaseDate}",
+            ["lowerEnergy"] = $"{lowerEnergy}"
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        IList<SpotifyTrackDTO> tracks = JsonConvert.DeserializeObject<List<SpotifyTrackDTO>>(response.Body) ?? new List<SpotifyTrackDTO>();
+        IList<SpotifyTrackDTO> expectedTracks = tracks.OrderBy(t => t.ReleaseDate)
+            .Where(t => String.Compare(t.ReleaseDate, lowerReleaseDate) > 0)
+            .Where(t => String.Compare(t.ReleaseDate, upperReleaseDate) < 0)
+            .Where(t => t.Energy > lowerEnergy)
+            .ToList();
+        Assert.Equal(50, tracks.Count);
+        Assert.Equal(expectedTracks, tracks);
+
+    }
+
+    [Fact]
+    public async void TestGetTrackPageAsyncGetPageSortByNameByDefault()
+    {
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["pageSize"] = "50",
+            ["pageNumber"] = "1",
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        IList<SpotifyTrackDTO> tracks = JsonConvert.DeserializeObject<List<SpotifyTrackDTO>>(response.Body) ?? new List<SpotifyTrackDTO>();
+        IList<SpotifyTrackDTO> expectedTracks = tracks.OrderBy(t => t.Name).ToList();
+        Assert.Equal(50, tracks.Count);
+        Assert.Equal(expectedTracks, tracks);
+
+    }
+
+    [Theory]
+    [InlineData("Sunrise")]
+    [InlineData("Johnny, Jack & Jameson")]
+    [InlineData("É pra Sempre (Ao Vivo)")]
+    public async void TestGetTrackPageAsyncGetPageSearchByName(string trackName)
+    {
+
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["pageSize"] = "50",
+            ["pageNumber"] = "1",
+            ["name"] = $"{trackName}"
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        IList<SpotifyTrackDTO> tracks = JsonConvert.DeserializeObject<List<SpotifyTrackDTO>>(response.Body) ?? new List<SpotifyTrackDTO>();
+        Assert.True(tracks.Count > 0);
+        foreach(var track in tracks)
+        {
+            Assert.Equal(trackName, track.Name);
+        }
+
+    }
+
+    [Fact]
+    public async void TestGetTrackPageAsyncGetPageSearchByNameNotFound()
+    {
+        string trackName = "abvwuhoh2190u1 11p891ip1j1j 1j j1j8 88j 1j8p91 p89";
+
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["pageSize"] = "50",
+            ["pageNumber"] = "1",
+            ["name"] = $"{trackName}"
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        Assert.Equal("Item(s) not found.", response.Body);
 
     }
 
