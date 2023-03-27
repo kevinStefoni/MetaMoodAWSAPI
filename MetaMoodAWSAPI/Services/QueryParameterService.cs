@@ -16,7 +16,7 @@ namespace MetaMoodAWSAPI.Services
         /// <exception cref="Exception">Thrown when there is missing or invalid input</exception>
         public static SpotifyParameters GetSpotifyQueryParameters(SpotifyParameters spotifyParameters, IDictionary<string, string> queryParameters)
         {
-            if(queryParameters.ContainsKey("pageSize"))
+            if (queryParameters.ContainsKey("pageSize"))
             {
                 try
                 {
@@ -26,14 +26,14 @@ namespace MetaMoodAWSAPI.Services
                 {
                     throw new Exception("Page size must be an integer.");
                 }
-                
+
             }
             else
             {
                 throw new Exception("Page size is a required parameter.");
             }
 
-            if(queryParameters.ContainsKey("pageNumber"))
+            if (queryParameters.ContainsKey("pageNumber"))
             {
                 try
                 {
@@ -314,6 +314,18 @@ namespace MetaMoodAWSAPI.Services
             }
 
             return spotifyParameters;
+        }
+
+        public static string GetCountParameters(IDictionary<string, string> pathParameters)
+        {
+            if (pathParameters.ContainsKey("table"))
+            {
+                return pathParameters["table"];
+            }
+            else
+            {
+                throw new Exception("No table provided to find the number of records in.");
+            }
         }
     }
 }

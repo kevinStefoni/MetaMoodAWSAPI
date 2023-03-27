@@ -7,6 +7,14 @@ namespace MetaMoodAWSAPI.Services
 {
     internal static class Response
     {
+        private readonly static IDictionary<string, string> CORSHeader = new Dictionary<string, string>()
+        {
+            { "Access-Control-Allow-Origin", @"https://ec2-3-238-222-13.compute-1.amazonaws.com" }
+        };
+        
+        
+
+
         /// <summary>
         /// A simple lambda that returns HttpStatus code 400 for AWS API Gateway HTTP response.
         /// The purpose of this method is to clean up the code in Function.cs.
@@ -18,6 +26,7 @@ namespace MetaMoodAWSAPI.Services
             new()
             {
                 StatusCode = (int)HttpStatusCode.BadRequest,
+                Headers = CORSHeader,
                 Body = errorMessage ?? "No error message provided"
             };
 
@@ -30,6 +39,7 @@ namespace MetaMoodAWSAPI.Services
             new()
             {
                 StatusCode = (int)HttpStatusCode.NotFound,
+                Headers = CORSHeader,
                 Body = "Item(s) not found."
             };
 
@@ -44,7 +54,16 @@ namespace MetaMoodAWSAPI.Services
             new()
             {
                 StatusCode = (int)HttpStatusCode.OK,
+                Headers = CORSHeader,
                 Body = JsonConvert.SerializeObject(objs)
+            };
+
+        public static APIGatewayHttpApiV2ProxyResponse OKCount(int count) =>
+            new()
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Headers = CORSHeader,
+                Body = count.ToString()
             };
 
 

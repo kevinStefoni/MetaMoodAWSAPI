@@ -42,9 +42,11 @@ public class Function
 
 
     /// <summary>
-    /// This function makes an asynchronous request to the database to retrieve and return a page of tracks.
+    /// This function makes an asynchronous request to the database to retrieve and return a page of tracks that
+    /// fits the given criteria.
     /// </summary>
-    /// <param name="request"></param>
+    /// <param name="request">request contains a dictionary that has all the query parameters necessary to
+    /// determine any search and sort criteria and paging parameters.</param>
     /// <param name="context"></param>
     /// <returns>A selected page of tracks from the spotify tracks table</returns>
     public async Task<APIGatewayHttpApiV2ProxyResponse> GetTrackPageAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
@@ -87,6 +89,54 @@ public class Function
         else
         {
             return Response.OK(tracks);
+        }
+
+    }
+
+    /// <summary>
+    /// This function returns the number of records in a given table. 
+    /// </summary>
+    /// <remarks>This function will mostly be used to determine how many pages of data there should be.</remarks>
+    /// <param name="request">request contains a path parameter that says which table to get the count of</param>
+    /// <param name="context"></param>
+    /// <returns>The number of records in a given table.</returns>
+    public async Task<APIGatewayHttpApiV2ProxyResponse> GetCountAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    {
+        string table = string.Empty;
+        int count = 0;
+
+        try
+        {
+            table = QueryParameterService.GetCountParameters(request.PathParameters);
+        }
+        catch (Exception ex)
+        {
+            Response.BadRequest(ex.Message);
+        }
+
+        switch (table)
+        {
+            case "spotify-tracks":
+                count = await _DBContext.SpotifyTracks.Select(
+                t => new SpotifyTrackDTO
+                {
+                    Name = t.Name,
+                }
+                ).CountAsync();
+                break;
+            default:
+                Response.NotFound();
+                break;
+        }
+
+
+        if (count < 0)
+        {
+            return Response.NotFound();
+        }
+        else
+        {
+            return Response.OKCount(count);
         }
 
     }
