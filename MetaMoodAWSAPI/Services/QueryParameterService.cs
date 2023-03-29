@@ -316,6 +316,12 @@ namespace MetaMoodAWSAPI.Services
             return spotifyParameters;
         }
 
+        /// <summary>
+        /// This method simply extracts the table name from the path parameter.
+        /// </summary>
+        /// <param name="pathParameters"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public static string GetCountParameters(IDictionary<string, string> pathParameters)
         {
             if (pathParameters.ContainsKey("table"))

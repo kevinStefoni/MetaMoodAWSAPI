@@ -6,6 +6,7 @@ using MetaMoodAWSAPI.QueryParameterModels;
 using MetaMoodAWSAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.Metrics;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -111,7 +112,7 @@ public class Function
         }
         catch (Exception ex)
         {
-            Response.BadRequest(ex.Message);
+            return Response.BadRequest(ex.Message);
         }
 
         switch (table)
@@ -125,8 +126,7 @@ public class Function
                 ).CountAsync();
                 break;
             default:
-                Response.NotFound();
-                break;
+                return Response.NotFound();
         }
 
 
@@ -137,6 +137,55 @@ public class Function
         else
         {
             return Response.OKCount(count);
+        }
+
+    }
+
+    /// <summary>
+    /// This function returns a list of strings containing the data for the bar graph that has the average values for each category
+    /// with a floating point value (besides loudness). 
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="context"></param>
+    /// <returns>A list of doubles converted to strings that will be used for the Chart.js bargraph with Spotify metric averages</returns>
+    public async Task<APIGatewayHttpApiV2ProxyResponse> GetSpotifyAveragesAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    {
+        IQueryable<SpotifyTrackDTO> tracks = _DBContext.SpotifyTracks.Select(
+        t => new SpotifyTrackDTO
+        {
+            Acousticness = t.Acousticness,
+            Danceability = t.Danceability,
+            Energy = t.Energy,
+            Liveness = t.Liveness,
+            Speechiness = t.Speechiness,
+            Instrumentalness = t.Instrumentalness,
+            Valence = t.Valence
+        }
+        );
+
+        IList<string> data = new List<string>();
+        double? avgAcousticness = await tracks.AverageAsync(t => t.Acousticness);
+        data.Add(avgAcousticness.ToString() ?? "0.00");
+        double? avgDanceability = await tracks.AverageAsync(t => t.Danceability);
+        data.Add(avgDanceability.ToString() ?? "0.00");
+        double? avgEnergy = await tracks.AverageAsync(t => t.Energy);
+        data.Add(avgEnergy.ToString() ?? "0.00");
+        double? avgLiveness = await tracks.AverageAsync(t => t.Liveness);
+        data.Add(avgLiveness.ToString() ?? "0.00");
+        double? avgSpeechiness = await tracks.AverageAsync(t => t.Speechiness);
+        data.Add(avgSpeechiness.ToString() ?? "0.00");
+        double? avgInstrumentalness = await tracks.AverageAsync(t => t.Instrumentalness);
+        data.Add(avgInstrumentalness.ToString() ?? "0.00");
+        double? avgValence = await tracks.AverageAsync(t => t.Valence);
+        data.Add(avgValence.ToString() ?? "0.00");
+
+        if (data.Count <= 0)
+        {
+            return Response.NotFound();
+        }
+        else
+        {
+            return Response.OK(data);
         }
 
     }
