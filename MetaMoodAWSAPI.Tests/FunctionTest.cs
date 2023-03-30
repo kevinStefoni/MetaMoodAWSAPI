@@ -43,7 +43,7 @@ public class FunctionTest
         APIGatewayHttpApiV2ProxyRequest request = new();
         request.QueryStringParameters = new Dictionary<string, string>
         {
-            ["pageSize"] = "10"
+            ["PageSize"] = "10"
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
         Assert.Equal("Page number is a required parameter.", response.Body);
@@ -57,8 +57,8 @@ public class FunctionTest
         APIGatewayHttpApiV2ProxyRequest request = new();
         request.QueryStringParameters = new Dictionary<string, string>
         {
-            ["pageSize"] = "abc",
-            ["pageNumber"] = "2"
+            ["PageSize"] = "abc",
+            ["PageNumber"] = "2"
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
         Assert.Equal("Page size must be an integer.", response.Body);
@@ -72,8 +72,8 @@ public class FunctionTest
         APIGatewayHttpApiV2ProxyRequest request = new();
         request.QueryStringParameters = new Dictionary<string, string>
         {
-            ["pageSize"] = "20",
-            ["pageNumber"] = "abc"
+            ["PageSize"] = "20",
+            ["PageNumber"] = "abc"
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
         Assert.Equal("Page number must be an integer.", response.Body);
@@ -87,9 +87,9 @@ public class FunctionTest
         APIGatewayHttpApiV2ProxyRequest request = new();
         request.QueryStringParameters = new Dictionary<string, string>
         {
-            ["pageSize"] = "20",
-            ["pageNumber"] = "2",
-            ["sortBy"] = "abc"
+            ["PageSize"] = "20",
+            ["PageNumber"] = "2",
+            ["SortBy"] = "abc"
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
         Assert.Equal("Invalid sort criteria provided.", response.Body);
@@ -103,9 +103,9 @@ public class FunctionTest
         APIGatewayHttpApiV2ProxyRequest request = new();
         request.QueryStringParameters = new Dictionary<string, string>
         {
-            ["pageSize"] = "20",
-            ["pageNumber"] = "2",
-            ["lowerPopularity"] = "abc"
+            ["PageSize"] = "20",
+            ["PageNumber"] = "2",
+            ["LowerPopularity"] = "abc"
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
         Assert.Equal("Lower bound for popularity must be an integer.", response.Body);
@@ -119,9 +119,9 @@ public class FunctionTest
         APIGatewayHttpApiV2ProxyRequest request = new();
         request.QueryStringParameters = new Dictionary<string, string>
         {
-            ["pageSize"] = "20",
-            ["pageNumber"] = "2",
-            ["upperValence"] = "abc"
+            ["PageSize"] = "20",
+            ["PageNumber"] = "2",
+            ["UpperValence"] = "abc"
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
         Assert.Equal("Upper bound for valence must be an integer.", response.Body);
@@ -135,9 +135,9 @@ public class FunctionTest
         APIGatewayHttpApiV2ProxyRequest request = new();
         request.QueryStringParameters = new Dictionary<string, string>
         {
-            ["pageSize"] = "20",
-            ["pageNumber"] = "2",
-            ["lowerAcousticness"] = ""
+            ["PageSize"] = "20",
+            ["PageNumber"] = "2",
+            ["LowerAcousticness"] = ""
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
         Assert.Equal("Lower bound for acousticness must be an integer.", response.Body);
@@ -151,8 +151,8 @@ public class FunctionTest
         APIGatewayHttpApiV2ProxyRequest request = new();
         request.QueryStringParameters = new Dictionary<string, string>
         {
-            ["pageSize"] = "20",
-            ["pageNumber"] = "2",
+            ["PageSize"] = "20",
+            ["PageNumber"] = "2",
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
         IList<SpotifyTrackDTO> tracks = JsonConvert.DeserializeObject<List<SpotifyTrackDTO>>(response.Body) ?? new List<SpotifyTrackDTO>();
@@ -167,9 +167,9 @@ public class FunctionTest
         APIGatewayHttpApiV2ProxyRequest request = new();
         request.QueryStringParameters = new Dictionary<string, string>
         {
-            ["pageSize"] = "50",
-            ["pageNumber"] = "3",
-            ["sortBy"] = "acousticness"
+            ["PageSize"] = "50",
+            ["PageNumber"] = "3",
+            ["SortBy"] = "acousticness"
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
         IList<SpotifyTrackDTO> tracks = JsonConvert.DeserializeObject<List<SpotifyTrackDTO>>(response.Body) ?? new List<SpotifyTrackDTO>();
@@ -187,10 +187,10 @@ public class FunctionTest
         APIGatewayHttpApiV2ProxyRequest request = new();
         request.QueryStringParameters = new Dictionary<string, string>
         {
-            ["pageSize"] = "50",
-            ["pageNumber"] = "1",
-            ["sortBy"] = "valence",
-            ["lowerLiveness"] = $"{livenessAmt}"
+            ["PageSize"] = "50",
+            ["PageNumber"] = "1",
+            ["SortBy"] = "valence",
+            ["LowerLiveness"] = $"{livenessAmt}"
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
         IList<SpotifyTrackDTO> tracks = JsonConvert.DeserializeObject<List<SpotifyTrackDTO>>(response.Body) ?? new List<SpotifyTrackDTO>();
@@ -210,12 +210,12 @@ public class FunctionTest
         APIGatewayHttpApiV2ProxyRequest request = new();
         request.QueryStringParameters = new Dictionary<string, string>
         {
-            ["pageSize"] = "50",
-            ["pageNumber"] = "1",
-            ["sortBy"] = "releasedate",
-            ["lowerReleaseDate"] = $"{lowerReleaseDate}",
-            ["upperReleaseDate"] = $"{upperReleaseDate}",
-            ["lowerEnergy"] = $"{lowerEnergy}"
+            ["PageSize"] = "50",
+            ["PageNumber"] = "1",
+            ["SortBy"] = "releasedate",
+            ["LowerReleaseDate"] = $"{lowerReleaseDate}",
+            ["UpperReleaseDate"] = $"{upperReleaseDate}",
+            ["LowerEnergy"] = $"{lowerEnergy}"
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
         IList<SpotifyTrackDTO> tracks = JsonConvert.DeserializeObject<List<SpotifyTrackDTO>>(response.Body) ?? new List<SpotifyTrackDTO>();
@@ -235,8 +235,8 @@ public class FunctionTest
         APIGatewayHttpApiV2ProxyRequest request = new();
         request.QueryStringParameters = new Dictionary<string, string>
         {
-            ["pageSize"] = "50",
-            ["pageNumber"] = "1",
+            ["PageSize"] = "50",
+            ["PageNumber"] = "1",
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
         IList<SpotifyTrackDTO> tracks = JsonConvert.DeserializeObject<List<SpotifyTrackDTO>>(response.Body) ?? new List<SpotifyTrackDTO>();
@@ -256,9 +256,9 @@ public class FunctionTest
         APIGatewayHttpApiV2ProxyRequest request = new();
         request.QueryStringParameters = new Dictionary<string, string>
         {
-            ["pageSize"] = "50",
-            ["pageNumber"] = "1",
-            ["name"] = $"{trackName}"
+            ["PageSize"] = "50",
+            ["PageNumber"] = "1",
+            ["Name"] = $"{trackName}"
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
         IList<SpotifyTrackDTO> tracks = JsonConvert.DeserializeObject<List<SpotifyTrackDTO>>(response.Body) ?? new List<SpotifyTrackDTO>();
@@ -278,9 +278,9 @@ public class FunctionTest
         APIGatewayHttpApiV2ProxyRequest request = new();
         request.QueryStringParameters = new Dictionary<string, string>
         {
-            ["pageSize"] = "50",
-            ["pageNumber"] = "1",
-            ["name"] = $"{trackName}"
+            ["PageSize"] = "50",
+            ["PageNumber"] = "1",
+            ["Name"] = $"{trackName}"
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
         Assert.Equal("Item(s) not found.", response.Body);

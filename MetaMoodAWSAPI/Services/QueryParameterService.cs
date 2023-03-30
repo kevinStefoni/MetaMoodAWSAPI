@@ -16,11 +16,11 @@ namespace MetaMoodAWSAPI.Services
         /// <exception cref="Exception">Thrown when there is missing or invalid input</exception>
         public static SpotifyParameters GetSpotifyQueryParameters(SpotifyParameters spotifyParameters, IDictionary<string, string> queryParameters)
         {
-            if (queryParameters.ContainsKey("pageSize"))
+            if (queryParameters.ContainsKey("PageSize"))
             {
                 try
                 {
-                    spotifyParameters.PageSize = Convert.ToInt32(queryParameters["pageSize"]);
+                    spotifyParameters.PageSize = Convert.ToInt32(queryParameters["PageSize"]);
                 }
                 catch
                 {
@@ -33,11 +33,11 @@ namespace MetaMoodAWSAPI.Services
                 throw new Exception("Page size is a required parameter.");
             }
 
-            if (queryParameters.ContainsKey("pageNumber"))
+            if (queryParameters.ContainsKey("PageNumber"))
             {
                 try
                 {
-                    spotifyParameters.PageNumber = Convert.ToInt32(queryParameters["pageNumber"]);
+                    spotifyParameters.PageNumber = Convert.ToInt32(queryParameters["PageNumber"]);
                 }
                 catch
                 {
@@ -49,35 +49,35 @@ namespace MetaMoodAWSAPI.Services
                 throw new Exception("Page number is a required parameter.");
             }
 
-            if (queryParameters.ContainsKey("sortBy"))
+            if (queryParameters.ContainsKey("SortBy"))
             {
-                spotifyParameters.SortBy = queryParameters["sortBy"];
+                spotifyParameters.SortBy = queryParameters["SortBy"];
 
                 if (!SpotifyValidation.ValidateSpotifySortBy(spotifyParameters.SortBy))
                     throw new Exception("Invalid sort criteria provided.");
 
             }
 
-            if (queryParameters.ContainsKey("name"))
+            if (queryParameters.ContainsKey("Name"))
             {
-                spotifyParameters.Name = queryParameters["name"];
+                spotifyParameters.Name = queryParameters["Name"];
             }
 
-            if (queryParameters.ContainsKey("lowerReleaseDate"))
+            if (queryParameters.ContainsKey("LowerReleaseDate"))
             {
-                spotifyParameters.LowerReleaseDate = queryParameters["lowerReleaseDate"];
+                spotifyParameters.LowerReleaseDate = queryParameters["LowerReleaseDate"];
             }
 
-            if (queryParameters.ContainsKey("upperReleaseDate"))
+            if (queryParameters.ContainsKey("UpperReleaseDate"))
             {
-                spotifyParameters.UpperReleaseDate = queryParameters["upperReleaseDate"];
+                spotifyParameters.UpperReleaseDate = queryParameters["UpperReleaseDate"];
             }
 
-            if (queryParameters.ContainsKey("lowerPopularity"))
+            if (queryParameters.ContainsKey("LowerPopularity"))
             {
                 try
                 {
-                    spotifyParameters.LowerPopularity = Convert.ToInt32(queryParameters["lowerPopularity"]);
+                    spotifyParameters.LowerPopularity = Convert.ToInt32(queryParameters["LowerPopularity"]);
                 }
                 catch
                 {
@@ -85,11 +85,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("upperPopularity"))
+            if (queryParameters.ContainsKey("UpperPopularity"))
             {
                 try
                 {
-                    spotifyParameters.UpperPopularity = Convert.ToInt32(queryParameters["upperPopularity"]);
+                    spotifyParameters.UpperPopularity = Convert.ToInt32(queryParameters["UpperPopularity"]);
                 }
                 catch
                 {
@@ -97,11 +97,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("lowerAcousticness"))
+            if (queryParameters.ContainsKey("LowerAcousticness"))
             {
                 try
                 {
-                    spotifyParameters.LowerAcousticness = Convert.ToDouble(queryParameters["lowerAcousticness"]);
+                    spotifyParameters.LowerAcousticness = Convert.ToDouble(queryParameters["LowerAcousticness"]);
                 }
                 catch
                 {
@@ -109,11 +109,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("upperAcousticness"))
+            if (queryParameters.ContainsKey("UpperAcousticness"))
             {
                 try
                 {
-                    spotifyParameters.UpperAcousticness = Convert.ToDouble(queryParameters["upperAcousticness"]);
+                    spotifyParameters.UpperAcousticness = Convert.ToDouble(queryParameters["UpperAcousticness"]);
                 }
                 catch
                 {
@@ -121,11 +121,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("lowerDanceability"))
+            if (queryParameters.ContainsKey("LowerDanceability"))
             {
                 try
                 {
-                    spotifyParameters.LowerDanceability = Convert.ToDouble(queryParameters["lowerDanceability"]);
+                    spotifyParameters.LowerDanceability = Convert.ToDouble(queryParameters["LowerDanceability"]);
                 }
                 catch
                 {
@@ -133,11 +133,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("upperDanceability"))
+            if (queryParameters.ContainsKey("UpperDanceability"))
             {
                 try
                 {
-                    spotifyParameters.UpperDanceability = Convert.ToDouble(queryParameters["upperDanceability"]);
+                    spotifyParameters.UpperDanceability = Convert.ToDouble(queryParameters["UpperDanceability"]);
                 }
                 catch
                 {
@@ -145,11 +145,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("lowerEnergy"))
+            if (queryParameters.ContainsKey("LowerEnergy"))
             {
                 try
                 {
-                    spotifyParameters.LowerEnergy = Convert.ToDouble(queryParameters["lowerEnergy"]);
+                    spotifyParameters.LowerEnergy = Convert.ToDouble(queryParameters["LowerEnergy"]);
                 }
                 catch
                 {
@@ -157,11 +157,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("upperEnergy"))
+            if (queryParameters.ContainsKey("UpperEnergy"))
             {
                 try
                 {
-                    spotifyParameters.UpperEnergy = Convert.ToDouble(queryParameters["upperEnergy"]);
+                    spotifyParameters.UpperEnergy = Convert.ToDouble(queryParameters["UpperEnergy"]);
                 }
                 catch
                 {
@@ -169,11 +169,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("lowerLiveness"))
+            if (queryParameters.ContainsKey("LowerLiveness"))
             {
                 try
                 {
-                    spotifyParameters.LowerLiveness = Convert.ToDouble(queryParameters["lowerLiveness"]);
+                    spotifyParameters.LowerLiveness = Convert.ToDouble(queryParameters["LowerLiveness"]);
                 }
                 catch
                 {
@@ -181,11 +181,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("upperLiveness"))
+            if (queryParameters.ContainsKey("UpperLiveness"))
             {
                 try
                 {
-                    spotifyParameters.UpperLiveness = Convert.ToDouble(queryParameters["upperLiveness"]);
+                    spotifyParameters.UpperLiveness = Convert.ToDouble(queryParameters["UpperLiveness"]);
                 }
                 catch
                 {
@@ -193,11 +193,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("lowerLoudness"))
+            if (queryParameters.ContainsKey("LowerLoudness"))
             {
                 try
                 {
-                    spotifyParameters.LowerLoudness = Convert.ToDouble(queryParameters["lowerLoudness"]);
+                    spotifyParameters.LowerLoudness = Convert.ToDouble(queryParameters["LowerLoudness"]);
                 }
                 catch
                 {
@@ -205,11 +205,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("upperLoudness"))
+            if (queryParameters.ContainsKey("UpperLoudness"))
             {
                 try
                 {
-                    spotifyParameters.UpperLoudness = Convert.ToDouble(queryParameters["upperLoudness"]);
+                    spotifyParameters.UpperLoudness = Convert.ToDouble(queryParameters["UpperLoudness"]);
                 }
                 catch
                 {
@@ -217,11 +217,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("lowerSpeechiness"))
+            if (queryParameters.ContainsKey("LowerSpeechiness"))
             {
                 try
                 {
-                    spotifyParameters.LowerSpeechiness = Convert.ToDouble(queryParameters["lowerSpeechiness"]);
+                    spotifyParameters.LowerSpeechiness = Convert.ToDouble(queryParameters["LowerSpeechiness"]);
                 }
                 catch
                 {
@@ -229,11 +229,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("upperSpeechiness"))
+            if (queryParameters.ContainsKey("UpperSpeechiness"))
             {
                 try
                 {
-                    spotifyParameters.UpperSpeechiness = Convert.ToDouble(queryParameters["upperSpeechiness"]);
+                    spotifyParameters.UpperSpeechiness = Convert.ToDouble(queryParameters["UpperSpeechiness"]);
                 }
                 catch
                 {
@@ -241,11 +241,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("lowerTempo"))
+            if (queryParameters.ContainsKey("LowerTempo"))
             {
                 try
                 {
-                    spotifyParameters.LowerTempo = Convert.ToDouble(queryParameters["lowerTempo"]);
+                    spotifyParameters.LowerTempo = Convert.ToDouble(queryParameters["LowerTempo"]);
                 }
                 catch
                 {
@@ -253,11 +253,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("upperTempo"))
+            if (queryParameters.ContainsKey("UpperTempo"))
             {
                 try
                 {
-                    spotifyParameters.UpperTempo = Convert.ToDouble(queryParameters["upperTempo"]);
+                    spotifyParameters.UpperTempo = Convert.ToDouble(queryParameters["UpperTempo"]);
                 }
                 catch
                 {
@@ -265,11 +265,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("lowerInstrumentalness"))
+            if (queryParameters.ContainsKey("LowerInstrumentalness"))
             {
                 try
                 {
-                    spotifyParameters.LowerInstrumentalness = Convert.ToDouble(queryParameters["lowerInstrumentalness"]);
+                    spotifyParameters.LowerInstrumentalness = Convert.ToDouble(queryParameters["LowerInstrumentalness"]);
                 }
                 catch
                 {
@@ -277,11 +277,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("upperInstrumentalness"))
+            if (queryParameters.ContainsKey("UpperInstrumentalness"))
             {
                 try
                 {
-                    spotifyParameters.UpperInstrumentalness = Convert.ToDouble(queryParameters["upperInstrumentalness"]);
+                    spotifyParameters.UpperInstrumentalness = Convert.ToDouble(queryParameters["UpperInstrumentalness"]);
                 }
                 catch
                 {
@@ -289,11 +289,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("lowerValence"))
+            if (queryParameters.ContainsKey("LowerValence"))
             {
                 try
                 {
-                    spotifyParameters.LowerValence = Convert.ToDouble(queryParameters["lowerValence"]);
+                    spotifyParameters.LowerValence = Convert.ToDouble(queryParameters["LowerValence"]);
                 }
                 catch
                 {
@@ -301,11 +301,11 @@ namespace MetaMoodAWSAPI.Services
                 }
             }
 
-            if (queryParameters.ContainsKey("upperValence"))
+            if (queryParameters.ContainsKey("UpperValence"))
             {
                 try
                 {
-                    spotifyParameters.UpperValence = Convert.ToDouble(queryParameters["upperValence"]);
+                    spotifyParameters.UpperValence = Convert.ToDouble(queryParameters["UpperValence"]);
                 }
                 catch
                 {
