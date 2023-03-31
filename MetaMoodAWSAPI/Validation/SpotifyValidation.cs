@@ -8,18 +8,18 @@ namespace MetaMoodAWSAPI.Validation
         public static bool ValidateSpotifySortBy(string? sortby)
         {
 
-            return sortby == "name"
-                || sortby == "releasedate"
-                || sortby == "popularity"
-                || sortby == "acousticness"
-                || sortby == "danceability"
-                || sortby == "energy"
-                || sortby == "liveness"
-                || sortby == "loudness"
-                || sortby == "speechiness"
-                || sortby == "tempo"
-                || sortby == "instrumentalness"
-                || sortby == "valence";
+            return sortby == "Name"
+                || sortby == "ReleaseDate"
+                || sortby == "Popularity"
+                || sortby == "Acousticness"
+                || sortby == "Danceability"
+                || sortby == "Energy"
+                || sortby == "Liveness"
+                || sortby == "Loudness"
+                || sortby == "Speechiness"
+                || sortby == "Tempo"
+                || sortby == "Instrumentalness"
+                || sortby == "Valence";
 
         }
     }

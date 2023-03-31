@@ -169,7 +169,7 @@ public class FunctionTest
         {
             ["PageSize"] = "50",
             ["PageNumber"] = "3",
-            ["SortBy"] = "acousticness"
+            ["SortBy"] = "Acousticness"
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
         IList<SpotifyTrackDTO> tracks = JsonConvert.DeserializeObject<List<SpotifyTrackDTO>>(response.Body) ?? new List<SpotifyTrackDTO>();
@@ -189,7 +189,7 @@ public class FunctionTest
         {
             ["PageSize"] = "50",
             ["PageNumber"] = "1",
-            ["SortBy"] = "valence",
+            ["SortBy"] = "Valence",
             ["LowerLiveness"] = $"{livenessAmt}"
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
@@ -212,7 +212,7 @@ public class FunctionTest
         {
             ["PageSize"] = "50",
             ["PageNumber"] = "1",
-            ["SortBy"] = "releasedate",
+            ["SortBy"] = "ReleaseDate",
             ["LowerReleaseDate"] = $"{lowerReleaseDate}",
             ["UpperReleaseDate"] = $"{upperReleaseDate}",
             ["LowerEnergy"] = $"{lowerEnergy}"
