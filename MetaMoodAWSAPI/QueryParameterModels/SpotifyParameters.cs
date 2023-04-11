@@ -8,7 +8,7 @@ namespace MetaMoodAWSAPI.QueryParameterModels
 
         public int PageNumber { get; set; }
 
-        public string SortBy { get; set; } = "name";
+        public string SortBy { get; set; } = "Name";
 
         public string? Name { get; set; } = null;
 

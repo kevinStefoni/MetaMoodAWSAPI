@@ -6,7 +6,8 @@ using MetaMoodAWSAPI.QueryParameterModels;
 using MetaMoodAWSAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics.Metrics;
+using MySqlConnector;
+using System.Data;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -79,9 +80,12 @@ public class Function
             Instrumentalness = t.Instrumentalness,
             Valence = t.Valence
         }
-        ).SpotifyTrackSortBy<SpotifyTrackDTO>(spotifyParameters.SortBy)
+        )
         .SpotifyTrackSearchBy<SpotifyTrackDTO>(spotifyParameters)
-        .GetPage(spotifyParameters.PageSize, spotifyParameters.PageNumber).ToListAsync();
+        .GetPage(spotifyParameters.PageSize, spotifyParameters.PageNumber)
+        .SpotifyTrackSortBy<SpotifyTrackDTO>(spotifyParameters.SortBy)
+        .ToListAsync();
+        
 
         if (tracks.Count <= 0)
         {
@@ -101,11 +105,11 @@ public class Function
     /// <param name="request">request contains a path parameter that says which table to get the count of</param>
     /// <param name="context"></param>
     /// <returns>The number of records in a given table.</returns>
-    public async Task<APIGatewayHttpApiV2ProxyResponse> GetCountAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    public APIGatewayHttpApiV2ProxyResponse GetCount(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
-        string table = string.Empty;
         int count = 0;
 
+        string table;
         try
         {
             table = QueryParameterService.GetCountParameters(request.PathParameters);
@@ -118,12 +122,26 @@ public class Function
         switch (table)
         {
             case "spotify-tracks":
-                count = await _DBContext.SpotifyTracks.Select(
-                t => new SpotifyTrackDTO
+                using (var sqlConnection1 = new MySqlConnection(System.Environment.GetEnvironmentVariable("ConnectionString")))
                 {
-                    Name = t.Name,
+                    using (var cmd = new MySqlCommand()
+                    {
+                        CommandText = $"SELECT `spotify-tracks` FROM counts",
+                        CommandType = CommandType.Text,
+                        Connection = sqlConnection1
+                    })
+                    {
+                        sqlConnection1.Open();
+
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                count = (int)reader[0];
+                            }
+                        }
+                    }
                 }
-                ).CountAsync();
                 break;
             default:
                 return Response.NotFound();
@@ -148,36 +166,36 @@ public class Function
     /// <param name="request"></param>
     /// <param name="context"></param>
     /// <returns>A list of doubles converted to strings that will be used for the Chart.js bargraph with Spotify metric averages</returns>
-    public async Task<APIGatewayHttpApiV2ProxyResponse> GetSpotifyAveragesAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    public APIGatewayHttpApiV2ProxyResponse GetSpotifyAverages(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
-        IQueryable<SpotifyTrackDTO> tracks = _DBContext.SpotifyTracks.Select(
-        t => new SpotifyTrackDTO
-        {
-            Acousticness = t.Acousticness,
-            Danceability = t.Danceability,
-            Energy = t.Energy,
-            Liveness = t.Liveness,
-            Speechiness = t.Speechiness,
-            Instrumentalness = t.Instrumentalness,
-            Valence = t.Valence
-        }
-        );
-
         IList<string> data = new List<string>();
-        double? avgAcousticness = await tracks.AverageAsync(t => t.Acousticness);
-        data.Add(avgAcousticness.ToString() ?? "0.00");
-        double? avgDanceability = await tracks.AverageAsync(t => t.Danceability);
-        data.Add(avgDanceability.ToString() ?? "0.00");
-        double? avgEnergy = await tracks.AverageAsync(t => t.Energy);
-        data.Add(avgEnergy.ToString() ?? "0.00");
-        double? avgLiveness = await tracks.AverageAsync(t => t.Liveness);
-        data.Add(avgLiveness.ToString() ?? "0.00");
-        double? avgSpeechiness = await tracks.AverageAsync(t => t.Speechiness);
-        data.Add(avgSpeechiness.ToString() ?? "0.00");
-        double? avgInstrumentalness = await tracks.AverageAsync(t => t.Instrumentalness);
-        data.Add(avgInstrumentalness.ToString() ?? "0.00");
-        double? avgValence = await tracks.AverageAsync(t => t.Valence);
-        data.Add(avgValence.ToString() ?? "0.00");
+
+        using (var sqlConnection1 = new MySqlConnection(System.Environment.GetEnvironmentVariable("ConnectionString")))
+        {
+            using (var cmd = new MySqlCommand()
+            {
+                CommandText = $"SELECT * FROM spotify_metric_averages",
+                CommandType = CommandType.Text,
+                Connection = sqlConnection1
+            })
+            {
+                sqlConnection1.Open();
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        data.Add(((double)reader[0]).ToString() ?? "0.00");
+                        data.Add(((double)reader[1]).ToString() ?? "0.00");
+                        data.Add(((double)reader[2]).ToString() ?? "0.00");
+                        data.Add(((double)reader[3]).ToString() ?? "0.00");
+                        data.Add(((double)reader[4]).ToString() ?? "0.00");
+                        data.Add(((double)reader[5]).ToString() ?? "0.00");
+                        data.Add(((double)reader[6]).ToString() ?? "0.00");
+                    }
+                }
+            }
+        }
 
         if (data.Count <= 0)
         {

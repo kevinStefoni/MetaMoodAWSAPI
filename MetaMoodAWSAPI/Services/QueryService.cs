@@ -29,18 +29,18 @@ namespace MetaMoodAWSAPI.Services
         {
             return sortBy switch
             {
-                "name" => (IQueryable<T>)query.OrderBy(t => t.Name),
-                "releasedate" => (IQueryable<T>)query.OrderBy(t => t.ReleaseDate),
-                "popularity" => (IQueryable<T>)query.OrderBy(t => t.Popularity),
-                "acousticness" => (IQueryable<T>)query.OrderBy(t => t.Acousticness),
-                "danceability" => (IQueryable<T>)query.OrderBy(t => t.Danceability),
-                "energy" => (IQueryable<T>)query.OrderBy(t => t.Energy),
-                "liveness" => (IQueryable<T>)query.OrderBy(t => t.Liveness),
-                "loudness" => (IQueryable<T>)query.OrderBy(t => t.Loudness),
-                "speechiness" => (IQueryable<T>)query.OrderBy(t => t.Speechiness),
-                "tempo" => (IQueryable<T>)query.OrderBy(t => t.Tempo),
-                "instrumentalness" => (IQueryable<T>)query.OrderBy(t => t.Instrumentalness),
-                "valence" => (IQueryable<T>)query.OrderBy(t => t.Valence),
+                "Name" => (IQueryable<T>)query.OrderBy(t => t.Name),
+                "ReleaseDate" => (IQueryable<T>)query.OrderBy(t => t.ReleaseDate),
+                "Popularity" => (IQueryable<T>)query.OrderBy(t => t.Popularity),
+                "Acousticness" => (IQueryable<T>)query.OrderBy(t => t.Acousticness),
+                "Danceability" => (IQueryable<T>)query.OrderBy(t => t.Danceability),
+                "Energy" => (IQueryable<T>)query.OrderBy(t => t.Energy),
+                "Liveness" => (IQueryable<T>)query.OrderBy(t => t.Liveness),
+                "Loudness" => (IQueryable<T>)query.OrderBy(t => t.Loudness),
+                "Speechiness" => (IQueryable<T>)query.OrderBy(t => t.Speechiness),
+                "Tempo" => (IQueryable<T>)query.OrderBy(t => t.Tempo),
+                "Instrumentalness" => (IQueryable<T>)query.OrderBy(t => t.Instrumentalness),
+                "Valence" => (IQueryable<T>)query.OrderBy(t => t.Valence),
                 _ => (IQueryable<T>)query.OrderBy(t => t.Name),
             };
         }

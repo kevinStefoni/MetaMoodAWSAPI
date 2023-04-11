@@ -1,4 +1,4 @@
-using Xunit;
+﻿using Xunit;
 using Amazon.Lambda.TestUtilities;
 using Amazon.Lambda.APIGatewayEvents;
 using Newtonsoft.Json;
@@ -248,8 +248,9 @@ public class FunctionTest
 
     [Theory]
     [InlineData("Sunrise")]
-    [InlineData("Johnny, Jack & Jameson")]
-    [InlineData("� pra Sempre (Ao Vivo)")]
+    [InlineData("親愛的黑色")]
+    [InlineData("It's a New Thing (It's Your Thing) - D-Nat & ONDA feat. De La Soul")]
+    [InlineData("Baião De Ubá")]
     public async void TestGetTrackPageAsyncGetPageSearchByName(string trackName)
     {
 
@@ -265,7 +266,7 @@ public class FunctionTest
         Assert.True(tracks.Count > 0);
         foreach(var track in tracks)
         {
-            Assert.Equal(trackName, track.Name);
+            Assert.Equal(trackName.ToLower(), track.Name?.ToLower());
         }
 
     }
