@@ -362,5 +362,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# aws lambda information
+# connection strings removed
 aws-lambda-tools-defaults.json
+appsettings.json
