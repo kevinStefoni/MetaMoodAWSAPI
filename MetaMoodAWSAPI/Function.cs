@@ -53,6 +53,8 @@ public class Function
     /// <returns>A selected page of tracks from the spotify tracks table</returns>
     public async Task<APIGatewayHttpApiV2ProxyResponse> GetTrackPageAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
+        Console.WriteLine();
+
         SpotifyParameters spotifyParameters = new ();
 
         try
