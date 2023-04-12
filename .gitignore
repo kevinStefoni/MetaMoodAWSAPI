@@ -365,3 +365,4 @@ FodyWeavers.xsd
 # connection strings removed
 aws-lambda-tools-defaults.json
 appsettings.json
+launchSettings.json

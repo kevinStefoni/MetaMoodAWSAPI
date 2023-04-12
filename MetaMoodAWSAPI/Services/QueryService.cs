@@ -1,5 +1,6 @@
 ﻿using MetaMoodAWSAPI.DTOs;
 using MetaMoodAWSAPI.QueryParameterModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace MetaMoodAWSAPI.Services
 {
@@ -54,7 +55,7 @@ namespace MetaMoodAWSAPI.Services
         /// <returns>A query that has all the WHERE conditions applied</returns>
         public static IQueryable<T> SpotifyTrackSearchBy<T>(this IQueryable<SpotifyTrackDTO> query, SpotifyParameters spotifyParameters)
         {
-
+            
             if(spotifyParameters.Name is not null)
                 query = query.Where(t => t.Name == spotifyParameters.Name);
 
