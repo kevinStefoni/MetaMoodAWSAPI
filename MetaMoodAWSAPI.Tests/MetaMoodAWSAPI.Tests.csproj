@@ -15,8 +15,5 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MetaMoodAWSAPI\MetaMoodAWSAPI.csproj" />
-	<Content Include="appsettings.json">
-		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</Content>
   </ItemGroup>
 </Project>

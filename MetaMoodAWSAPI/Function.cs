@@ -85,7 +85,48 @@ public class Function
         .GetPage(spotifyParameters.PageSize, spotifyParameters.PageNumber)
         .SpotifyTrackSortBy<SpotifyTrackDTO>(spotifyParameters.SortBy)
         .ToListAsync();
-        
+
+/*        IList<SpotifyTrackDTO> tracks = new List<SpotifyTrackDTO>();
+        using (MySqlConnection conn = new (System.Environment.GetEnvironmentVariable("ConnectionString")))
+        {
+            MySqlCommand cmd = new("GET_SPOTIFY_TRACKS", conn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            cmd.Parameters.AddWithValue("@PageSize", spotifyParameters.PageSize);
+            cmd.Parameters.AddWithValue("@PageNumber", spotifyParameters.PageNumber);
+            cmd.Parameters.AddWithValue("@Name", spotifyParameters.Name);
+            cmd.Parameters.AddWithValue("@SortBy", spotifyParameters.SortBy);
+
+            MySqlDataAdapter adapter = new (cmd);
+            DataTable dtTracks = new();
+            adapter.Fill(dtTracks);
+            var a = dtTracks.Select().GetValue(0) as SpotifyTrackDTO;
+            foreach (DataRow r in dtTracks.Rows)
+            {
+                SpotifyTrackDTO t = new()
+                {
+                    Name = r["name"].ToString(),
+                    ReleaseDate = r["releasedate"].ToString(),
+                    Popularity = Convert.ToInt32(r["popularity"]),
+                    Acousticness = Convert.ToDouble(r["acousticness"]),
+                    Danceability = Convert.ToDouble(r["danceability"]),
+                    Energy = Convert.ToDouble(r["energy"]),
+                    Liveness = Convert.ToDouble(r["liveness"]),
+                    Loudness = Convert.ToDouble(r["loudness"]),
+                    Speechiness = Convert.ToDouble(r["speechiness"]),
+                    Tempo = Convert.ToDouble(r["tempo"]),
+                    Instrumentalness = Convert.ToDouble(r["instrumentalness"]),
+                    Valence = Convert.ToDouble(r["valence"])
+                };
+                
+            }
+
+            conn.Close();
+
+        }*/
+
 
         if (tracks.Count <= 0)
         {
@@ -122,24 +163,20 @@ public class Function
         switch (table)
         {
             case "spotify-tracks":
-                using (var sqlConnection1 = new MySqlConnection(System.Environment.GetEnvironmentVariable("ConnectionString")))
+                using (var conn = new MySqlConnection(System.Environment.GetEnvironmentVariable("ConnectionString")))
                 {
-                    using (var cmd = new MySqlCommand()
+                    using var cmd = new MySqlCommand()
                     {
                         CommandText = $"SELECT `spotify-tracks` FROM counts",
                         CommandType = CommandType.Text,
-                        Connection = sqlConnection1
-                    })
-                    {
-                        sqlConnection1.Open();
+                        Connection = conn
+                    };
+                    conn.Open();
 
-                        using (var reader = cmd.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                count = (int)reader[0];
-                            }
-                        }
+                    using var reader = cmd.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        count = (int)reader[0];
                     }
                 }
                 break;
@@ -170,30 +207,26 @@ public class Function
     {
         IList<string> data = new List<string>();
 
-        using (var sqlConnection1 = new MySqlConnection(System.Environment.GetEnvironmentVariable("ConnectionString")))
+        using (var conn = new MySqlConnection(System.Environment.GetEnvironmentVariable("ConnectionString")))
         {
-            using (var cmd = new MySqlCommand()
+            using var cmd = new MySqlCommand()
             {
                 CommandText = $"SELECT * FROM spotify_metric_averages",
                 CommandType = CommandType.Text,
-                Connection = sqlConnection1
-            })
-            {
-                sqlConnection1.Open();
+                Connection = conn
+            };
+            conn.Open();
 
-                using (var reader = cmd.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        data.Add(((double)reader[0]).ToString() ?? "0.00");
-                        data.Add(((double)reader[1]).ToString() ?? "0.00");
-                        data.Add(((double)reader[2]).ToString() ?? "0.00");
-                        data.Add(((double)reader[3]).ToString() ?? "0.00");
-                        data.Add(((double)reader[4]).ToString() ?? "0.00");
-                        data.Add(((double)reader[5]).ToString() ?? "0.00");
-                        data.Add(((double)reader[6]).ToString() ?? "0.00");
-                    }
-                }
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                data.Add(((double)reader[0]).ToString() ?? "0.00");
+                data.Add(((double)reader[1]).ToString() ?? "0.00");
+                data.Add(((double)reader[2]).ToString() ?? "0.00");
+                data.Add(((double)reader[3]).ToString() ?? "0.00");
+                data.Add(((double)reader[4]).ToString() ?? "0.00");
+                data.Add(((double)reader[5]).ToString() ?? "0.00");
+                data.Add(((double)reader[6]).ToString() ?? "0.00");
             }
         }
 
