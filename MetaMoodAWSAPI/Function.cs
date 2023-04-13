@@ -66,48 +66,26 @@ public class Function
             return Response.BadRequest(ex.Message);
         }
 
-        IList<SpotifyTrackDTO> tracks = await _DBContext.SpotifyTracks.Select(
-        t => new SpotifyTrackDTO
+        IList<SpotifyTrackDTO> tracks = new List<SpotifyTrackDTO>();
+        using (MySqlConnection conn = new(System.Environment.GetEnvironmentVariable("ConnectionString")))
         {
-            Name = t.Name,
-            ReleaseDate = t.ReleaseDate,
-            Popularity = t.Popularity,
-            Acousticness = t.Acousticness,
-            Danceability = t.Danceability,
-            Energy = t.Energy,
-            Liveness = t.Liveness,
-            Loudness = t.Loudness,
-            Speechiness = t.Speechiness,
-            Tempo = t.Tempo,
-            Instrumentalness = t.Instrumentalness,
-            Valence = t.Valence
-        }
-        )
-        .SpotifyTrackSearchBy<SpotifyTrackDTO>(spotifyParameters)
-        .GetPage(spotifyParameters.PageSize, spotifyParameters.PageNumber)
-        .SpotifyTrackSortBy<SpotifyTrackDTO>(spotifyParameters.SortBy)
-        .ToListAsync();
-
-/*        IList<SpotifyTrackDTO> tracks = new List<SpotifyTrackDTO>();
-        using (MySqlConnection conn = new (System.Environment.GetEnvironmentVariable("ConnectionString")))
-        {
+            await conn.OpenAsync();
             MySqlCommand cmd = new("GET_SPOTIFY_TRACKS", conn)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
             cmd.Parameters.AddWithValue("@PageSize", spotifyParameters.PageSize);
-            cmd.Parameters.AddWithValue("@PageNumber", spotifyParameters.PageNumber);
+            cmd.Parameters.AddWithValue("@PageOffset", (spotifyParameters.PageNumber - 1) * spotifyParameters.PageSize);
             cmd.Parameters.AddWithValue("@Name", spotifyParameters.Name);
             cmd.Parameters.AddWithValue("@SortBy", spotifyParameters.SortBy);
 
-            MySqlDataAdapter adapter = new (cmd);
+            MySqlDataAdapter adapter = new(cmd);
             DataTable dtTracks = new();
             adapter.Fill(dtTracks);
-            var a = dtTracks.Select().GetValue(0) as SpotifyTrackDTO;
             foreach (DataRow r in dtTracks.Rows)
             {
-                SpotifyTrackDTO t = new()
+                tracks.Add(new()
                 {
                     Name = r["name"].ToString(),
                     ReleaseDate = r["releasedate"].ToString(),
@@ -121,13 +99,10 @@ public class Function
                     Tempo = Convert.ToDouble(r["tempo"]),
                     Instrumentalness = Convert.ToDouble(r["instrumentalness"]),
                     Valence = Convert.ToDouble(r["valence"])
-                };
+                });
                 
             }
-
-            conn.Close();
-
-        }*/
+        }
 
 
         if (tracks.Count <= 0)
