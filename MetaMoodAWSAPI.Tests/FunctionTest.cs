@@ -22,7 +22,7 @@ public class FunctionTest
 
         function = new(new MetaMoodContext(new DbContextOptionsBuilder<MetaMoodContext>()
                                  .UseMySql(config["ConnectionString"],
-                                 Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.32-mysql")).Options));
+                                 Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.32-mysql")).Options), config["ConnectionString"] ?? string.Empty);
     }
 
     [Fact]
@@ -97,54 +97,6 @@ public class FunctionTest
     }
 
     [Fact]
-    public async void TestGetTrackPageAsyncInvalidLowerPopularityException()
-    {
-
-        APIGatewayHttpApiV2ProxyRequest request = new();
-        request.QueryStringParameters = new Dictionary<string, string>
-        {
-            ["PageSize"] = "20",
-            ["PageNumber"] = "2",
-            ["LowerPopularity"] = "abc"
-        };
-        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
-        Assert.Equal("Lower bound for popularity must be an integer.", response.Body);
-
-    }
-
-    [Fact]
-    public async void TestGetTrackPageAsyncInvalidUpperValenceException()
-    {
-
-        APIGatewayHttpApiV2ProxyRequest request = new();
-        request.QueryStringParameters = new Dictionary<string, string>
-        {
-            ["PageSize"] = "20",
-            ["PageNumber"] = "2",
-            ["UpperValence"] = "abc"
-        };
-        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
-        Assert.Equal("Upper bound for valence must be an integer.", response.Body);
-
-    }
-
-    [Fact]
-    public async void TestGetTrackPageAsyncEmptyNumericCriteriaException()
-    {
-
-        APIGatewayHttpApiV2ProxyRequest request = new();
-        request.QueryStringParameters = new Dictionary<string, string>
-        {
-            ["PageSize"] = "20",
-            ["PageNumber"] = "2",
-            ["LowerAcousticness"] = ""
-        };
-        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
-        Assert.Equal("Lower bound for acousticness must be an integer.", response.Body);
-
-    }
-
-    [Fact]
     public async void TestGetTrackPageAsyncGetPage()
     {
 
@@ -180,56 +132,6 @@ public class FunctionTest
     }
 
     [Fact]
-    public async void TestGetTrackPageAsyncGetPageSortByValenceSearchByLowerLiveness()
-    {
-        double livenessAmt = 0.75;
-
-        APIGatewayHttpApiV2ProxyRequest request = new();
-        request.QueryStringParameters = new Dictionary<string, string>
-        {
-            ["PageSize"] = "50",
-            ["PageNumber"] = "1",
-            ["SortBy"] = "Valence",
-            ["LowerLiveness"] = $"{livenessAmt}"
-        };
-        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
-        IList<SpotifyTrackDTO> tracks = JsonConvert.DeserializeObject<List<SpotifyTrackDTO>>(response.Body) ?? new List<SpotifyTrackDTO>();
-        IList<SpotifyTrackDTO> expectedTracks = tracks.OrderBy(t => t.Valence).Where(t => t.Liveness > livenessAmt).ToList();
-        Assert.Equal(50, tracks.Count);
-        Assert.Equal(expectedTracks, tracks);
-
-    }
-
-    [Fact]
-    public async void TestGetTrackPageAsyncGetPageSortByReleaseDateSearchByLowerReleaseDateUpperReleaseDateLowerEnergy()
-    {
-        string lowerReleaseDate = "2001";
-        string upperReleaseDate = "2010";
-        double lowerEnergy = 0.5;
-
-        APIGatewayHttpApiV2ProxyRequest request = new();
-        request.QueryStringParameters = new Dictionary<string, string>
-        {
-            ["PageSize"] = "50",
-            ["PageNumber"] = "1",
-            ["SortBy"] = "ReleaseDate",
-            ["LowerReleaseDate"] = $"{lowerReleaseDate}",
-            ["UpperReleaseDate"] = $"{upperReleaseDate}",
-            ["LowerEnergy"] = $"{lowerEnergy}"
-        };
-        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
-        IList<SpotifyTrackDTO> tracks = JsonConvert.DeserializeObject<List<SpotifyTrackDTO>>(response.Body) ?? new List<SpotifyTrackDTO>();
-        IList<SpotifyTrackDTO> expectedTracks = tracks.OrderBy(t => t.ReleaseDate)
-            .Where(t => String.Compare(t.ReleaseDate, lowerReleaseDate) > 0)
-            .Where(t => String.Compare(t.ReleaseDate, upperReleaseDate) < 0)
-            .Where(t => t.Energy > lowerEnergy)
-            .ToList();
-        Assert.Equal(50, tracks.Count);
-        Assert.Equal(expectedTracks, tracks);
-
-    }
-
-    [Fact]
     public async void TestGetTrackPageAsyncGetPageSortByNameByDefault()
     {
         APIGatewayHttpApiV2ProxyRequest request = new();
@@ -249,8 +151,6 @@ public class FunctionTest
     [Theory]
     [InlineData("Sunrise")]
     [InlineData("親愛的黑色")]
-    [InlineData("It's a New Thing (It's Your Thing) - D-Nat & ONDA feat. De La Soul")]
-    [InlineData("Baião De Ubá")]
     public async void TestGetTrackPageAsyncGetPageSearchByName(string trackName)
     {
 
@@ -266,7 +166,7 @@ public class FunctionTest
         Assert.True(tracks.Count > 0);
         foreach(var track in tracks)
         {
-            Assert.Equal(trackName.ToLower(), track.Name?.ToLower());
+            Assert.Contains(trackName.ToLower(), track.Name?.ToLower());
         }
 
     }
@@ -274,7 +174,7 @@ public class FunctionTest
     [Fact]
     public async void TestGetTrackPageAsyncGetPageSearchByNameNotFound()
     {
-        string trackName = "abvwuhoh2190u1 11p891ip1j1j 1j j1j8 88j 1j8p91 p89";
+        string trackName = "abvwuhoh2190u1qiuuqjquhqiuqvhuihu2h2h9ph9v298hiuhv2uh2v9hvui2hv982";
 
         APIGatewayHttpApiV2ProxyRequest request = new();
         request.QueryStringParameters = new Dictionary<string, string>

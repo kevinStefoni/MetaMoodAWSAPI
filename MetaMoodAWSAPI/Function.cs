@@ -4,6 +4,7 @@ using MetaMoodAWSAPI.DTOs;
 using MetaMoodAWSAPI.Entities;
 using MetaMoodAWSAPI.QueryParameterModels;
 using MetaMoodAWSAPI.Services;
+using MetaMoodAWSAPI.Validation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MySqlConnector;
@@ -18,6 +19,7 @@ public class Function
 {
     private readonly IServiceCollection _serviceCollection;
     private readonly MetaMoodContext _DBContext;
+    private readonly string Conn = System.Environment.GetEnvironmentVariable("ConnectionString") ?? string.Empty;
 
     /// <summary>
     /// This is the constructor for the Lambda function that sets up the collection of services, calls RegisterServices(),
@@ -26,7 +28,7 @@ public class Function
     public Function()
     {
         _serviceCollection = new ServiceCollection();
-        ServiceProvider serviceProvider = _serviceCollection.RegisterServices().BuildServiceProvider();
+        ServiceProvider serviceProvider = _serviceCollection.RegisterServices(Conn).BuildServiceProvider();
         _DBContext = serviceProvider.GetRequiredService<MetaMoodContext>();
     }
 
@@ -34,10 +36,11 @@ public class Function
     /// Constructor that allows injection of DBContext. This method is to allow unit tests to inject their own DB context.
     /// </summary>
     /// <param name="dbContext">The database context created in the test project</param>
-    public Function(MetaMoodContext dbContext)
+    public Function(MetaMoodContext dbContext, string connectionString)
     {
+        Conn = connectionString;
         _serviceCollection = new ServiceCollection();
-        _serviceCollection.RegisterServices().BuildServiceProvider();
+        _serviceCollection.RegisterServices(Conn).BuildServiceProvider();
         _DBContext = dbContext;
     }
 
@@ -53,8 +56,6 @@ public class Function
     /// <returns>A selected page of tracks from the spotify tracks table</returns>
     public async Task<APIGatewayHttpApiV2ProxyResponse> GetTrackPageAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
-        Console.WriteLine();
-
         SpotifyParameters spotifyParameters = new ();
 
         try
@@ -67,7 +68,7 @@ public class Function
         }
 
         IList<SpotifyTrackDTO> tracks = new List<SpotifyTrackDTO>();
-        using (MySqlConnection conn = new(System.Environment.GetEnvironmentVariable("ConnectionString")))
+        using (MySqlConnection conn = new(Conn))
         {
             await conn.OpenAsync();
             MySqlCommand cmd = new("GET_SPOTIFY_TRACKS", conn)
@@ -140,7 +141,7 @@ public class Function
         switch (table)
         {
             case "spotify-tracks":
-                using (var conn = new MySqlConnection(System.Environment.GetEnvironmentVariable("ConnectionString")))
+                using (var conn = new MySqlConnection(Conn))
                 {
                     using var cmd = new MySqlCommand()
                     {
@@ -174,6 +175,47 @@ public class Function
     }
 
     /// <summary>
+    /// This function returns the number of records that are in a result set after a search criteria has been applied.
+    /// <remark>
+    /// The performance of this function should be slower than that of the generic GetCount() that uses a separate table that
+    /// keeps track of counts to retrieve the number of records in a table. 
+    /// </remark>
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="context"></param>
+    /// <returns>The number of records in the result set of a search query</returns>
+    public async Task<APIGatewayHttpApiV2ProxyResponse> GetSpotifySearchCountAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    {
+        int count = 0;
+        string Name;
+
+        if (request.QueryStringParameters is not null && request.QueryStringParameters.ContainsKey("Name"))
+        {
+            Name = request.QueryStringParameters["Name"].SanitizeString();
+        }
+        else
+        {
+            return Response.BadRequest("Search criteria has to be provided.");
+        }
+
+
+        using (MySqlConnection conn = new(Conn))
+        {
+            await conn.OpenAsync();
+            MySqlCommand cmd = new("GET_SPOTIFY_TRACKS_COUNT", conn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            cmd.Parameters.AddWithValue("@Name", Name);
+        
+            count = Convert.ToInt32(await cmd.ExecuteScalarAsync());
+        }
+
+        return Response.OKCount(count);
+        
+    }
+
+    /// <summary>
     /// This function returns a list of strings containing the data for the bar graph that has the average values for each category
     /// with a floating point value (besides loudness). 
     /// </summary>
@@ -184,7 +226,7 @@ public class Function
     {
         IList<string> data = new List<string>();
 
-        using (var conn = new MySqlConnection(System.Environment.GetEnvironmentVariable("ConnectionString")))
+        using (var conn = new MySqlConnection(Conn))
         {
             using var cmd = new MySqlCommand()
             {

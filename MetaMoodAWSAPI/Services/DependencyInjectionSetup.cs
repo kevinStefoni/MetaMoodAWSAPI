@@ -25,13 +25,13 @@ namespace MetaMoodAWSAPI.Services
         /// </remarks>
         /// <param name="services">the collection of services</param>
         /// <returns>IServiceCollection with all services registered</returns>
-        public static IServiceCollection RegisterServices(this IServiceCollection services)
+        public static IServiceCollection RegisterServices(this IServiceCollection services, string Conn)
         {
             services.AddEntityFrameworkMySql().AddDbContext<MetaMoodContext>(options =>
             {
                 options.UseMySql
                 (
-                    System.Environment.GetEnvironmentVariable("ConnectionString"),
+                    Conn,
                     Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.32-mysql")
                 );
             }
