@@ -8,19 +8,19 @@ namespace MetaMoodAWSAPI.Services
 
         /// <summary>
         /// This method retrieves and calls validators for all query parameters that were provided in the GET request.
-        /// It will populate the SpotifyParameters object that has all the search and sort criteria. 
+        /// It will populate the SQLParameters object that has all the search and sort criteria. 
         /// </summary>
-        /// <param name="spotifyParameters"></param>
+        /// <param name="sqlParameters"></param>
         /// <param name="queryParameters"></param>
         /// <returns>An object with all search criteria provided by URL query parameters</returns>
         /// <exception cref="Exception">Thrown when there is missing or invalid input</exception>
-        public static SpotifyParameters GetSpotifyQueryParameters(SpotifyParameters spotifyParameters, IDictionary<string, string> queryParameters)
+        public static SQLParameters GetSQLParameters(SQLParameters sqlParameters, IDictionary<string, string> queryParameters)
         {
             if (queryParameters.ContainsKey("PageSize"))
             {
                 try
                 {
-                    spotifyParameters.PageSize = Convert.ToInt32(queryParameters["PageSize"]);
+                    sqlParameters.PageSize = Convert.ToInt32(queryParameters["PageSize"]);
                 }
                 catch
                 {
@@ -37,7 +37,7 @@ namespace MetaMoodAWSAPI.Services
             {
                 try
                 {
-                    spotifyParameters.PageNumber = Convert.ToInt32(queryParameters["PageNumber"]);
+                    sqlParameters.PageNumber = Convert.ToInt32(queryParameters["PageNumber"]);
                 }
                 catch
                 {
@@ -51,19 +51,19 @@ namespace MetaMoodAWSAPI.Services
 
             if (queryParameters.ContainsKey("SortBy"))
             {
-                spotifyParameters.SortBy = queryParameters["SortBy"];
+                sqlParameters.SortBy = queryParameters["SortBy"];
 
-                if (!SpotifyValidation.ValidateSpotifySortBy(spotifyParameters.SortBy))
+                if (!DataValidation.ValidateSortBy(sqlParameters.SortBy))
                     throw new Exception("Invalid sort criteria provided.");
 
             }
 
-            if (queryParameters.ContainsKey("Name"))
+            if (queryParameters.ContainsKey("Search"))
             {
-                spotifyParameters.Name = queryParameters["Name"].SanitizeString();
+                sqlParameters.Search = queryParameters["Search"].SanitizeString();
             }
 
-            return spotifyParameters;
+            return sqlParameters;
         }
 
         /// <summary>

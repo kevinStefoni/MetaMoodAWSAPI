@@ -1,14 +1,14 @@
 ﻿namespace MetaMoodAWSAPI.QueryParameterModels
 {
-    internal class SpotifyParameters
+    internal class SQLParameters
     {
         public int PageSize { get; set; }
 
         public int PageNumber { get; set; }
 
-        public string SortBy { get; set; } = "Name";
+        public string? SortBy { get; set; };
 
-        public string? Name { get; set; } = null;
+        public string? Search { get; set; } = null;
 
     }
 }

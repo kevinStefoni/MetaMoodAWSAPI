@@ -2,10 +2,10 @@
 
 namespace MetaMoodAWSAPI.Validation
 {
-    internal class SpotifyValidation
+    internal class DataValidation
     {
 
-        public static bool ValidateSpotifySortBy(string? sortby)
+        public static bool ValidateSortBy(string? sortby)
         {
 
             return sortby == "Name"
@@ -19,7 +19,12 @@ namespace MetaMoodAWSAPI.Validation
                 || sortby == "Speechiness"
                 || sortby == "Tempo"
                 || sortby == "Instrumentalness"
-                || sortby == "Valence";
+                || sortby == "Valence"
+                || sortby == "Author"
+                || sortby == "Body"
+                || sortby == "User"
+                || sortby == "Tweet"
+                || sortby == "Emotion";
 
         }
     }

@@ -27,5 +27,9 @@
 
         public double? Valence { get; set; }
 
+        public int Emotion { get; set; }
+
+        public string? ImageColorHex { get; set; }
+
     }
 }

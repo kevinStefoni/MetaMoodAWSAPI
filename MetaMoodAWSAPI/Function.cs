@@ -5,10 +5,10 @@ using MetaMoodAWSAPI.Entities;
 using MetaMoodAWSAPI.QueryParameterModels;
 using MetaMoodAWSAPI.Services;
 using MetaMoodAWSAPI.Validation;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MySqlConnector;
 using System.Data;
+using System.Reflection;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -56,11 +56,11 @@ public class Function
     /// <returns>A selected page of tracks from the spotify tracks table</returns>
     public async Task<APIGatewayHttpApiV2ProxyResponse> GetTrackPageAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
-        SpotifyParameters spotifyParameters = new ();
+        SQLParameters spotifyParameters = new ();
 
         try
         {
-            spotifyParameters = QueryParameterService.GetSpotifyQueryParameters(spotifyParameters, request.QueryStringParameters);
+            spotifyParameters = QueryParameterService.GetSQLParameters(spotifyParameters, request.QueryStringParameters);
         }
         catch (Exception ex)
         {
@@ -78,7 +78,7 @@ public class Function
 
             cmd.Parameters.AddWithValue("@PageSize", spotifyParameters.PageSize);
             cmd.Parameters.AddWithValue("@PageOffset", (spotifyParameters.PageNumber - 1) * spotifyParameters.PageSize);
-            cmd.Parameters.AddWithValue("@Name", spotifyParameters.Name);
+            cmd.Parameters.AddWithValue("@Search", spotifyParameters.Search);
             cmd.Parameters.AddWithValue("@SortBy", spotifyParameters.SortBy);
 
             MySqlDataAdapter adapter = new(cmd);
@@ -99,7 +99,9 @@ public class Function
                     Speechiness = Convert.ToDouble(r["speechiness"]),
                     Tempo = Convert.ToDouble(r["tempo"]),
                     Instrumentalness = Convert.ToDouble(r["instrumentalness"]),
-                    Valence = Convert.ToDouble(r["valence"])
+                    Valence = Convert.ToDouble(r["valence"]),
+                    Emotion = Convert.ToInt32(r["emotion"]),
+                    ImageColorHex = r["image_color_hex"].ToString()
                 });
                 
             }
@@ -113,6 +115,114 @@ public class Function
         else
         {
             return Response.OK(tracks);
+        }
+
+    }
+
+    public async Task<APIGatewayHttpApiV2ProxyResponse> GetCommentPageAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    {
+        SQLParameters redditParameters = new();
+
+        try
+        {
+            redditParameters = QueryParameterService.GetSQLParameters(redditParameters, request.QueryStringParameters);
+        }
+        catch (Exception ex)
+        {
+            return Response.BadRequest(ex.Message);
+        }
+
+        IList<RedditCommentDTO> comments = new List<RedditCommentDTO>();
+        using (MySqlConnection conn = new(Conn))
+        {
+            await conn.OpenAsync();
+            MySqlCommand cmd = new("GET_REDDIT_COMMENTS", conn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            cmd.Parameters.AddWithValue("@PageSize", redditParameters.PageSize);
+            cmd.Parameters.AddWithValue("@PageOffset", (redditParameters.PageNumber - 1) * redditParameters.PageSize);
+            cmd.Parameters.AddWithValue("@Search", redditParameters.Search);
+            cmd.Parameters.AddWithValue("@SortBy", redditParameters.SortBy);
+
+            MySqlDataAdapter adapter = new(cmd);
+            DataTable dtComments = new();
+            adapter.Fill(dtComments);
+            foreach (DataRow r in dtComments.Rows)
+            {
+                comments.Add(new()
+                {
+                    Body = r["body"].ToString(),
+                    Author = r["author"].ToString(),
+                    Emotion = Convert.ToInt32(r["emotion"])
+
+                });
+            }
+        }
+
+
+        if (comments.Count <= 0)
+        {
+            return Response.NotFound();
+        }
+        else
+        {
+            return Response.OK(comments);
+        }
+
+    }
+
+    public async Task<APIGatewayHttpApiV2ProxyResponse> GetTweetPageAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    {
+        SQLParameters tweetParameters = new();
+
+        try
+        {
+            tweetParameters = QueryParameterService.GetSQLParameters(tweetParameters, request.QueryStringParameters);
+        }
+        catch (Exception ex)
+        {
+            return Response.BadRequest(ex.Message);
+        }
+
+        IList<TweetDTO> comments = new List<TweetDTO>();
+        using (MySqlConnection conn = new(Conn))
+        {
+            await conn.OpenAsync();
+            MySqlCommand cmd = new("GET_TWEETS", conn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            cmd.Parameters.AddWithValue("@PageSize", tweetParameters.PageSize);
+            cmd.Parameters.AddWithValue("@PageOffset", (tweetParameters.PageNumber - 1) * tweetParameters.PageSize);
+            cmd.Parameters.AddWithValue("@Search", tweetParameters.Search);
+            cmd.Parameters.AddWithValue("@SortBy", tweetParameters.SortBy);
+
+            MySqlDataAdapter adapter = new(cmd);
+            DataTable dtComments = new();
+            adapter.Fill(dtComments);
+            foreach (DataRow r in dtComments.Rows)
+            {
+                comments.Add(new()
+                {
+                    User = r["user"].ToString(),
+                    Tweet = r["tweet"].ToString(),
+                    Emotion = Convert.ToInt32(r["emotion"])
+
+                });
+            }
+        }
+
+
+        if (comments.Count <= 0)
+        {
+            return Response.NotFound();
+        }
+        else
+        {
+            return Response.OK(comments);
         }
 
     }
@@ -189,9 +299,9 @@ public class Function
         int count = 0;
         string Name;
 
-        if (request.QueryStringParameters is not null && request.QueryStringParameters.ContainsKey("Name"))
+        if (request.QueryStringParameters is not null && request.QueryStringParameters.ContainsKey("Search"))
         {
-            Name = request.QueryStringParameters["Name"].SanitizeString();
+            Name = request.QueryStringParameters["Search"].SanitizeString();
         }
         else
         {
