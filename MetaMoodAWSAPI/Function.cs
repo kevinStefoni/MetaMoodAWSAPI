@@ -56,7 +56,10 @@ public class Function
     /// <returns>A selected page of tracks from the spotify tracks table</returns>
     public async Task<APIGatewayHttpApiV2ProxyResponse> GetTrackPageAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
-        SQLParameters spotifyParameters = new ();
+        SQLParameters spotifyParameters = new()
+        {
+            SortBy = "Name"
+        };
 
         try
         {
@@ -121,8 +124,10 @@ public class Function
 
     public async Task<APIGatewayHttpApiV2ProxyResponse> GetCommentPageAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
-        SQLParameters redditParameters = new();
-
+        SQLParameters redditParameters = new()
+        {
+            SortBy = "Body"
+        };
         try
         {
             redditParameters = QueryParameterService.GetSQLParameters(redditParameters, request.QueryStringParameters);
@@ -143,7 +148,7 @@ public class Function
 
             cmd.Parameters.AddWithValue("@PageSize", redditParameters.PageSize);
             cmd.Parameters.AddWithValue("@PageOffset", (redditParameters.PageNumber - 1) * redditParameters.PageSize);
-            cmd.Parameters.AddWithValue("@Search", redditParameters.Search);
+            cmd.Parameters.AddWithValue("@Search", Convert.ToInt32(redditParameters.Search));
             cmd.Parameters.AddWithValue("@SortBy", redditParameters.SortBy);
 
             MySqlDataAdapter adapter = new(cmd);
@@ -154,7 +159,6 @@ public class Function
                 comments.Add(new()
                 {
                     Body = r["body"].ToString(),
-                    Author = r["author"].ToString(),
                     Emotion = Convert.ToInt32(r["emotion"])
 
                 });
@@ -175,7 +179,10 @@ public class Function
 
     public async Task<APIGatewayHttpApiV2ProxyResponse> GetTweetPageAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
-        SQLParameters tweetParameters = new();
+        SQLParameters tweetParameters = new()
+        {
+            SortBy = "User"
+        };
 
         try
         {

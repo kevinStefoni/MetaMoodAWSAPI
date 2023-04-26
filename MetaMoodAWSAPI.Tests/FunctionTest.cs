@@ -159,7 +159,7 @@ public class FunctionTest
         {
             ["PageSize"] = "50",
             ["PageNumber"] = "1",
-            ["Name"] = $"{trackName}"
+            ["Search"] = $"{trackName}"
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
         IList<SpotifyTrackDTO> tracks = JsonConvert.DeserializeObject<List<SpotifyTrackDTO>>(response.Body) ?? new List<SpotifyTrackDTO>();
@@ -181,7 +181,230 @@ public class FunctionTest
         {
             ["PageSize"] = "50",
             ["PageNumber"] = "1",
-            ["Name"] = $"{trackName}"
+            ["Search"] = $"{trackName}"
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        Assert.Equal("Item(s) not found.", response.Body);
+
+    }
+
+    [Fact]
+    public async void TestGetCommentPageAsync()
+    {
+
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["PageSize"] = "20",
+            ["PageNumber"] = "2",
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetCommentPageAsync(request, new TestLambdaContext());
+        IList<RedditCommentDTO> comments = JsonConvert.DeserializeObject<List<RedditCommentDTO>>(response.Body) ?? new List<RedditCommentDTO>();
+        Assert.Equal(20, comments.Count);
+
+    }
+
+    [Fact]
+    public async void TestGetCommentPageAsyncSortByBodyByDefault()
+    {
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["PageSize"] = "50",
+            ["PageNumber"] = "1",
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        IList<RedditCommentDTO> comments = JsonConvert.DeserializeObject<List<RedditCommentDTO>>(response.Body) ?? new List<RedditCommentDTO>();
+        IList<RedditCommentDTO> expectedComments = comments.OrderBy(t => t.Body).ToList();
+        Assert.Equal(50, comments.Count);
+        Assert.Equal(expectedComments, comments);
+
+    }
+
+    [Fact]
+    public async void TestGetCommentPageAsyncSortByBody()
+    {
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["PageSize"] = "50",
+            ["PageNumber"] = "1",
+            ["SortBy"] = "Body"
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        IList<RedditCommentDTO> comments = JsonConvert.DeserializeObject<List<RedditCommentDTO>>(response.Body) ?? new List<RedditCommentDTO>();
+        IList<RedditCommentDTO> expectedComments = comments.OrderBy(t => t.Body).ToList();
+        Assert.Equal(50, comments.Count);
+        Assert.Equal(expectedComments, comments);
+
+    }
+
+    [Fact]
+    public async void TestGetCommentPageAsyncSortByEmotion()
+    {
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["PageSize"] = "50",
+            ["PageNumber"] = "1",
+            ["SortBy"] = "Emotion"
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        IList<RedditCommentDTO> comments = JsonConvert.DeserializeObject<List<RedditCommentDTO>>(response.Body) ?? new List<RedditCommentDTO>();
+        IList<RedditCommentDTO> expectedComments = comments.OrderBy(t => t.Emotion).ToList();
+        Assert.Equal(50, comments.Count);
+        Assert.Equal(expectedComments, comments);
+
+    }
+
+    [Theory]
+    [InlineData (0)]
+    [InlineData (1)]
+    [InlineData (2)]
+    [InlineData (3)]
+    [InlineData (4)]
+    [InlineData (5)]
+    public async void TestGetCommentPageAsyncSearch(int Search)
+    {
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["PageSize"] = "50",
+            ["PageNumber"] = "1",
+            ["SortBy"] = "Body",
+            ["Search"] = Search.ToString()
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        IList<RedditCommentDTO> comments = JsonConvert.DeserializeObject<List<RedditCommentDTO>>(response.Body) ?? new List<RedditCommentDTO>();
+        Assert.True(comments.Count > 0);
+        foreach (var c in comments)
+        {
+            Assert.Equal(Search, c.Emotion);
+        }
+
+    }
+
+    [Fact]
+    public async void TestGetCommentPageAsyncGetPageSearchByEmotionNotFound()
+    {
+        string commentSearch = "abvwuhoh2190u1qiuuqjquhqiuqvhuihu2h2h9ph9v298hiuhv2uh2v9hvui2hv982";
+
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["PageSize"] = "50",
+            ["PageNumber"] = "1",
+            ["Search"] = $"{commentSearch}"
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        Assert.Equal("Item(s) not found.", response.Body);
+
+    }
+
+    [Fact]
+    public async void TestGetTweetPageAsync()
+    {
+
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["PageSize"] = "20",
+            ["PageNumber"] = "2",
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTweetPageAsync(request, new TestLambdaContext());
+        IList<TweetDTO> tweets = JsonConvert.DeserializeObject<List<TweetDTO>>(response.Body) ?? new List<TweetDTO>();
+        Assert.Equal(20, tweets.Count);
+
+    }
+
+    [Fact]
+    public async void TestGetTweetPageAsyncSortByTweetByDefault()
+    {
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["PageSize"] = "50",
+            ["PageNumber"] = "1",
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        IList<TweetDTO> tweets = JsonConvert.DeserializeObject<List<TweetDTO>>(response.Body) ?? new List<TweetDTO>();
+        IList<TweetDTO> expectedTweets = tweets.OrderBy(t => t.Tweet).ToList();
+        Assert.Equal(50, tweets.Count);
+        Assert.Equal(expectedTweets, tweets);
+
+    }
+
+    [Fact]
+    public async void TestGetTweetPageAsyncSortByTweet()
+    {
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["PageSize"] = "50",
+            ["PageNumber"] = "1",
+            ["SortBy"] = "Tweet"
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        IList<TweetDTO> tweets = JsonConvert.DeserializeObject<List<TweetDTO>>(response.Body) ?? new List<TweetDTO>();
+        IList<TweetDTO> expectedTweets = tweets.OrderBy(t => t.Tweet).ToList();
+        Assert.Equal(50, tweets.Count);
+        Assert.Equal(expectedTweets, tweets);
+
+    }
+
+    [Fact]
+    public async void TestGetTweetPageAsyncSortByEmotion()
+    {
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["PageSize"] = "50",
+            ["PageNumber"] = "1",
+            ["SortBy"] = "Emotion"
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        IList<TweetDTO> tweets = JsonConvert.DeserializeObject<List<TweetDTO>>(response.Body) ?? new List<TweetDTO>();
+        IList<TweetDTO> expectedTweets = tweets.OrderBy(t => t.Emotion).ToList();
+        Assert.Equal(50, tweets.Count);
+        Assert.Equal(expectedTweets, tweets);
+
+    }
+
+    [Theory]
+    [InlineData("test")]
+    [InlineData("hello")]
+    [InlineData("basketball")]
+    public async void TestGetTweetPageAsyncSearch(string Search)
+    {
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["PageSize"] = "50",
+            ["PageNumber"] = "1",
+            ["SortBy"] = "Tweet",
+            ["Search"] = Search
+        };
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        IList<TweetDTO> comments = JsonConvert.DeserializeObject<List<TweetDTO>>(response.Body) ?? new List<TweetDTO>();
+        Assert.True(comments.Count > 0);
+        foreach (var c in comments)
+        {
+            Assert.Contains(Search.ToLower(), c.Tweet?.ToLower());
+        }
+
+    }
+
+    [Fact]
+    public async void TestGetTweetPageAsyncGetPageSearchByTweetNotFound()
+    {
+        string commentSearch = "abvwuhoh2190u1qiuuqjquhqiuqvhuihu2h2h9ph9v298hiuhv2uh2v9hvui2hv982";
+
+        APIGatewayHttpApiV2ProxyRequest request = new();
+        request.QueryStringParameters = new Dictionary<string, string>
+        {
+            ["PageSize"] = "50",
+            ["PageNumber"] = "1",
+            ["Search"] = $"{commentSearch}"
         };
         APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
         Assert.Equal("Item(s) not found.", response.Body);

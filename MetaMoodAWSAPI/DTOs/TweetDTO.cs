@@ -1,6 +1,6 @@
 ﻿namespace MetaMoodAWSAPI.DTOs
 {
-    internal class TweetDTO
+    public class TweetDTO
     {
         public string? User { get; set; }
 
