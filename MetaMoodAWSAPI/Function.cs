@@ -275,6 +275,45 @@ public class Function
                     }
                 }
                 break;
+
+            case "reddit-comments":
+                using (var conn = new MySqlConnection(Conn))
+                {
+                    using var cmd = new MySqlCommand()
+                    {
+                        CommandText = $"SELECT `reddit-comments` FROM counts",
+                        CommandType = CommandType.Text,
+                        Connection = conn
+                    };
+                    conn.Open();
+
+                    using var reader = cmd.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        count = (int)reader[0];
+                    }
+                }
+                break;
+
+            case "tweets":
+                using (var conn = new MySqlConnection(Conn))
+                {
+                    using var cmd = new MySqlCommand()
+                    {
+                        CommandText = $"SELECT `tweets` FROM counts",
+                        CommandType = CommandType.Text,
+                        Connection = conn
+                    };
+                    conn.Open();
+
+                    using var reader = cmd.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        count = (int)reader[0];
+                    }
+                }
+                break;
+
             default:
                 return Response.NotFound();
         }
@@ -323,13 +362,80 @@ public class Function
             {
                 CommandType = CommandType.StoredProcedure
             };
-            cmd.Parameters.AddWithValue("@Name", Name);
+            cmd.Parameters.AddWithValue("@Search", Name);
         
             count = Convert.ToInt32(await cmd.ExecuteScalarAsync());
         }
 
         return Response.OKCount(count);
         
+    }
+
+    public async Task<APIGatewayHttpApiV2ProxyResponse> GetRedditSearchCountAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    {
+        int count = 0;
+        int Emotion;
+
+        if (request.QueryStringParameters is not null && request.QueryStringParameters.ContainsKey("Search"))
+        {
+            try
+            { 
+
+                Emotion = request.QueryStringParameters["Search"].ToLower().SanitizeString().ToIntCluster();
+
+            }catch(Exception e) { return Response.BadRequest(e.Message); }
+        }
+        else
+        {
+            return Response.BadRequest("Search criteria has to be provided.");
+        }
+
+
+        using (MySqlConnection conn = new(Conn))
+        {
+            await conn.OpenAsync();
+            MySqlCommand cmd = new("GET_REDDIT_COMMENTS_COUNT", conn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            cmd.Parameters.AddWithValue("@Search", Emotion);
+
+            count = Convert.ToInt32(await cmd.ExecuteScalarAsync());
+        }
+
+        return Response.OKCount(count);
+
+    }
+
+    public async Task<APIGatewayHttpApiV2ProxyResponse> GetTweetSearchCountAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    {
+        int count = 0;
+        string Search;
+
+        if (request.QueryStringParameters is not null && request.QueryStringParameters.ContainsKey("Search"))
+        {
+            Search = request.QueryStringParameters["Search"].SanitizeString();
+        }
+        else
+        {
+            return Response.BadRequest("Search criteria has to be provided.");
+        }
+
+
+        using (MySqlConnection conn = new(Conn))
+        {
+            await conn.OpenAsync();
+            MySqlCommand cmd = new("GET_TWEETS_COUNT", conn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            cmd.Parameters.AddWithValue("@Search", Search);
+
+            count = Convert.ToInt32(await cmd.ExecuteScalarAsync());
+        }
+
+        return Response.OKCount(count);
+
     }
 
     /// <summary>

@@ -1,9 +1,10 @@
 ﻿using MetaMoodAWSAPI.QueryParameterModels;
 using MetaMoodAWSAPI.Validation;
+using System.Runtime.CompilerServices;
 
 namespace MetaMoodAWSAPI.Services
 {
-    internal class QueryParameterService
+    internal static class QueryParameterService
     {
 
         /// <summary>
@@ -83,5 +84,19 @@ namespace MetaMoodAWSAPI.Services
                 throw new Exception("No table provided to find the number of records in.");
             }
         }
-    }
+
+        public static int ToIntCluster(this string clusterName)
+        {
+
+            return clusterName switch
+            {
+                "anger" => 0,
+                "fear" => 1,
+                "happy" => 2,
+                "love" => 3,
+                "sadness" => 4,
+                "surprise" => 5,
+                _ => throw new Exception("Invalid emotion search criteria."),
+            };
+        }
 }
