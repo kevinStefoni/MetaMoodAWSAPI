@@ -213,7 +213,7 @@ public class FunctionTest
             ["PageSize"] = "50",
             ["PageNumber"] = "1",
         };
-        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetCommentPageAsync(request, new TestLambdaContext());
         IList<RedditCommentDTO> comments = JsonConvert.DeserializeObject<List<RedditCommentDTO>>(response.Body) ?? new List<RedditCommentDTO>();
         IList<RedditCommentDTO> expectedComments = comments.OrderBy(t => t.Body).ToList();
         Assert.Equal(50, comments.Count);
@@ -231,7 +231,7 @@ public class FunctionTest
             ["PageNumber"] = "1",
             ["SortBy"] = "Body"
         };
-        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetCommentPageAsync(request, new TestLambdaContext());
         IList<RedditCommentDTO> comments = JsonConvert.DeserializeObject<List<RedditCommentDTO>>(response.Body) ?? new List<RedditCommentDTO>();
         IList<RedditCommentDTO> expectedComments = comments.OrderBy(t => t.Body).ToList();
         Assert.Equal(50, comments.Count);
@@ -249,7 +249,7 @@ public class FunctionTest
             ["PageNumber"] = "1",
             ["SortBy"] = "Emotion"
         };
-        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetCommentPageAsync(request, new TestLambdaContext());
         IList<RedditCommentDTO> comments = JsonConvert.DeserializeObject<List<RedditCommentDTO>>(response.Body) ?? new List<RedditCommentDTO>();
         IList<RedditCommentDTO> expectedComments = comments.OrderBy(t => t.Emotion).ToList();
         Assert.Equal(50, comments.Count);
@@ -274,7 +274,7 @@ public class FunctionTest
             ["SortBy"] = "Body",
             ["Search"] = Search.ToString()
         };
-        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetCommentPageAsync(request, new TestLambdaContext());
         IList<RedditCommentDTO> comments = JsonConvert.DeserializeObject<List<RedditCommentDTO>>(response.Body) ?? new List<RedditCommentDTO>();
         Assert.True(comments.Count > 0);
         foreach (var c in comments)
@@ -296,8 +296,8 @@ public class FunctionTest
             ["PageNumber"] = "1",
             ["Search"] = $"{commentSearch}"
         };
-        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
-        Assert.Equal("Item(s) not found.", response.Body);
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetCommentPageAsync(request, new TestLambdaContext());
+        Assert.Equal("Invalid emotion in search.", response.Body);
 
     }
 
@@ -326,7 +326,7 @@ public class FunctionTest
             ["PageSize"] = "50",
             ["PageNumber"] = "1",
         };
-        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTweetPageAsync(request, new TestLambdaContext());
         IList<TweetDTO> tweets = JsonConvert.DeserializeObject<List<TweetDTO>>(response.Body) ?? new List<TweetDTO>();
         IList<TweetDTO> expectedTweets = tweets.OrderBy(t => t.Tweet).ToList();
         Assert.Equal(50, tweets.Count);
@@ -344,7 +344,7 @@ public class FunctionTest
             ["PageNumber"] = "1",
             ["SortBy"] = "Tweet"
         };
-        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTweetPageAsync(request, new TestLambdaContext());
         IList<TweetDTO> tweets = JsonConvert.DeserializeObject<List<TweetDTO>>(response.Body) ?? new List<TweetDTO>();
         IList<TweetDTO> expectedTweets = tweets.OrderBy(t => t.Tweet).ToList();
         Assert.Equal(50, tweets.Count);
@@ -362,7 +362,7 @@ public class FunctionTest
             ["PageNumber"] = "1",
             ["SortBy"] = "Emotion"
         };
-        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTweetPageAsync(request, new TestLambdaContext());
         IList<TweetDTO> tweets = JsonConvert.DeserializeObject<List<TweetDTO>>(response.Body) ?? new List<TweetDTO>();
         IList<TweetDTO> expectedTweets = tweets.OrderBy(t => t.Emotion).ToList();
         Assert.Equal(50, tweets.Count);
@@ -384,10 +384,10 @@ public class FunctionTest
             ["SortBy"] = "Tweet",
             ["Search"] = Search
         };
-        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
-        IList<TweetDTO> comments = JsonConvert.DeserializeObject<List<TweetDTO>>(response.Body) ?? new List<TweetDTO>();
-        Assert.True(comments.Count > 0);
-        foreach (var c in comments)
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTweetPageAsync(request, new TestLambdaContext());
+        IList<TweetDTO> tweets = JsonConvert.DeserializeObject<List<TweetDTO>>(response.Body) ?? new List<TweetDTO>();
+        Assert.True(tweets.Count > 0);
+        foreach (var c in tweets)
         {
             Assert.Contains(Search.ToLower(), c.Tweet?.ToLower());
         }
@@ -406,7 +406,7 @@ public class FunctionTest
             ["PageNumber"] = "1",
             ["Search"] = $"{commentSearch}"
         };
-        APIGatewayHttpApiV2ProxyResponse response = await function.GetTrackPageAsync(request, new TestLambdaContext());
+        APIGatewayHttpApiV2ProxyResponse response = await function.GetTweetPageAsync(request, new TestLambdaContext());
         Assert.Equal("Item(s) not found.", response.Body);
 
     }

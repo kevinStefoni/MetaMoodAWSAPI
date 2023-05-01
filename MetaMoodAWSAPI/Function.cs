@@ -187,7 +187,7 @@ public class Function
     {
         SQLParameters tweetParameters = new()
         {
-            SortBy = "User"
+            SortBy = "Tweet"
         };
 
         try
