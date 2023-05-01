@@ -103,8 +103,8 @@ public class Function
                     Tempo = Convert.ToDouble(r["tempo"]),
                     Instrumentalness = Convert.ToDouble(r["instrumentalness"]),
                     Valence = Convert.ToDouble(r["valence"]),
-                    Emotion = Convert.ToInt32(r["emotion"]),
-                    ImageColorHex = r["image_color_hex"].ToString()
+                    Emotion = Convert.ToInt32(r[12]),
+                    CoverImageUrl = r[13].ToString()
                 });
                 
             }
@@ -148,7 +148,13 @@ public class Function
 
             cmd.Parameters.AddWithValue("@PageSize", redditParameters.PageSize);
             cmd.Parameters.AddWithValue("@PageOffset", (redditParameters.PageNumber - 1) * redditParameters.PageSize);
-            cmd.Parameters.AddWithValue("@Search", Convert.ToInt32(redditParameters.Search));
+
+            try
+            {
+                cmd.Parameters.AddWithValue("@Search", redditParameters.Search?.ToIntCluster());
+            }
+            catch { return Response.BadRequest("Invalid emotion in search."); }
+
             cmd.Parameters.AddWithValue("@SortBy", redditParameters.SortBy);
 
             MySqlDataAdapter adapter = new(cmd);
@@ -214,7 +220,7 @@ public class Function
             {
                 comments.Add(new()
                 {
-                    User = r["user"].ToString(),
+
                     Tweet = r["tweet"].ToString(),
                     Emotion = Convert.ToInt32(r["emotion"])
 
@@ -380,7 +386,6 @@ public class Function
         {
             try
             { 
-
                 Emotion = request.QueryStringParameters["Search"].ToLower().SanitizeString().ToIntCluster();
 
             }catch(Exception e) { return Response.BadRequest(e.Message); }
@@ -469,6 +474,117 @@ public class Function
                 data.Add(((double)reader[4]).ToString() ?? "0.00");
                 data.Add(((double)reader[5]).ToString() ?? "0.00");
                 data.Add(((double)reader[6]).ToString() ?? "0.00");
+            }
+        }
+
+        if (data.Count <= 0)
+        {
+            return Response.NotFound();
+        }
+        else
+        {
+            return Response.OK(data);
+        }
+
+    }
+
+    public APIGatewayHttpApiV2ProxyResponse GetRedditEmotionSum(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    {
+        IList<string> data = new List<string>();
+
+        using (var conn = new MySqlConnection(Conn))
+        {
+            using var cmd = new MySqlCommand()
+            {
+                CommandText = $"SELECT anger, fear, happy, love, sad, surprise FROM reddit_emotion_sum",
+                CommandType = CommandType.Text,
+                Connection = conn
+            };
+            conn.Open();
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                data.Add(((int)reader[0]).ToString() ?? "0.00");
+                data.Add(((int)reader[1]).ToString() ?? "0.00");
+                data.Add(((int)reader[2]).ToString() ?? "0.00");
+                data.Add(((int)reader[3]).ToString() ?? "0.00");
+                data.Add(((int)reader[4]).ToString() ?? "0.00");
+                data.Add(((int)reader[5]).ToString() ?? "0.00");
+            }
+        }
+
+        if (data.Count <= 0)
+        {
+            return Response.NotFound();
+        }
+        else
+        {
+            return Response.OK(data);
+        }
+
+    }
+
+    public APIGatewayHttpApiV2ProxyResponse GetTwitterEmotionSum(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    {
+        IList<string> data = new List<string>();
+
+        using (var conn = new MySqlConnection(Conn))
+        {
+            using var cmd = new MySqlCommand()
+            {
+                CommandText = $"SELECT anger, fear, happy, love, sad, surprise FROM twitter_emotion_sum",
+                CommandType = CommandType.Text,
+                Connection = conn
+            };
+            conn.Open();
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                data.Add(((int)reader[0]).ToString() ?? "0.00");
+                data.Add(((int)reader[1]).ToString() ?? "0.00");
+                data.Add(((int)reader[2]).ToString() ?? "0.00");
+                data.Add(((int)reader[3]).ToString() ?? "0.00");
+                data.Add(((int)reader[4]).ToString() ?? "0.00");
+                data.Add(((int)reader[5]).ToString() ?? "0.00");
+            }
+        }
+
+        if (data.Count <= 0)
+        {
+            return Response.NotFound();
+        }
+        else
+        {
+            return Response.OK(data);
+        }
+
+    }
+
+    public APIGatewayHttpApiV2ProxyResponse GetSpotifyEmotionSum(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    {
+        IList<string> data = new List<string>();
+
+        using (var conn = new MySqlConnection(Conn))
+        {
+            using var cmd = new MySqlCommand()
+            {
+                CommandText = $"SELECT anger, fear, happy, love, sad, surprise FROM spotify_emotion_sum",
+                CommandType = CommandType.Text,
+                Connection = conn
+            };
+            conn.Open();
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                data.Add(((int)reader[0]).ToString() ?? "0.00");
+                data.Add(((int)reader[1]).ToString() ?? "0.00");
+                data.Add(((int)reader[2]).ToString() ?? "0.00");
+                data.Add(((int)reader[3]).ToString() ?? "0.00");
+                data.Add(((int)reader[4]).ToString() ?? "0.00");
+                data.Add(((int)reader[5]).ToString() ?? "0.00");
             }
         }
 

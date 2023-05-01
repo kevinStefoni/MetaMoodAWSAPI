@@ -2,7 +2,6 @@
 {
     public class TweetDTO
     {
-        public string? User { get; set; }
 
         public string? Tweet { get; set; }
 

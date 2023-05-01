@@ -91,12 +91,18 @@ namespace MetaMoodAWSAPI.Services
             return clusterName switch
             {
                 "anger" => 0,
+                "angry" => 0,
+                "fearful" => 1,
                 "fear" => 1,
                 "happy" => 2,
+                "happiness" => 2,
                 "love" => 3,
                 "sadness" => 4,
+                "sad" => 4,
                 "surprise" => 5,
+                "surprised" => 5,
                 _ => throw new Exception("Invalid emotion search criteria."),
             };
         }
+    }
 }

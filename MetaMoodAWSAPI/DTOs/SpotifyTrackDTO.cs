@@ -29,7 +29,7 @@
 
         public int Emotion { get; set; }
 
-        public string? ImageColorHex { get; set; }
+        public string? CoverImageUrl { get; set; }
 
     }
 }
